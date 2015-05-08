@@ -1,15 +1,18 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -23,25 +26,29 @@ public class AddJobDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtRunable;
 	private JTextField txtInput;
-	
+
 	private File runnableFile;
 	private File inputFile;
-	
+
 	/**
 	 * Create the dialog.
-	 * @param master 
+	 * 
+	 * @param master
 	 */
 	public AddJobDialog(Master master) {
-		setBounds(100, 100, 450, 300);
+		setTitle("Add a Job");
+		setBounds(100, 100, 395, 169);
 		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		{
 			JPanel panel = new JPanel();
 			contentPanel.add(panel);
+			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
 				JLabel lblRunnable = new JLabel("Runnable File: ");
+				lblRunnable.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblRunnable);
 			}
 			{
@@ -55,11 +62,12 @@ public class AddJobDialog extends JDialog {
 					public void actionPerformed(ActionEvent e) {
 						JFileChooser fc = new JFileChooser();
 						fc.setDialogTitle("Select Runnable File For Job");
-						fc.setFileFilter(new FileNameExtensionFilter("Java Runnable file (.jar)", "jar"));								
+						fc.setFileFilter(new FileNameExtensionFilter(
+								"Java Runnable file (.jar)", "jar"));
 						int returnVal = fc.showOpenDialog(AddJobDialog.this);
 						if (returnVal == JFileChooser.APPROVE_OPTION) {
 							runnableFile = fc.getSelectedFile();
-			                txtRunable.setText(runnableFile.getPath());
+							txtRunable.setText(runnableFile.getPath());
 						}
 					}
 				});
@@ -69,8 +77,10 @@ public class AddJobDialog extends JDialog {
 		{
 			JPanel panel = new JPanel();
 			contentPanel.add(panel);
+			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
 				JLabel lblInput = new JLabel("Input File: ");
+				lblInput.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblInput);
 			}
 			{
@@ -88,7 +98,7 @@ public class AddJobDialog extends JDialog {
 						int returnVal = fc.showOpenDialog(AddJobDialog.this);
 						if (returnVal == JFileChooser.APPROVE_OPTION) {
 							inputFile = fc.getSelectedFile();
-			                txtInput.setText(inputFile.getPath());
+							txtInput.setText(inputFile.getPath());
 						}
 					}
 				});
@@ -96,18 +106,34 @@ public class AddJobDialog extends JDialog {
 		}
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
 				okButton.addActionListener(new ActionListener() {
-					
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						master.addJob(runnableFile, inputFile);
-						setVisible(false);
-						dispose();
+						if (runnableFile == null || !runnableFile.isFile()) {
+							runnableFile = new File(txtRunable.getText());
+							if (!runnableFile.isFile() || !runnableFile.getName().endsWith(".jar"))
+								JOptionPane.showMessageDialog(AddJobDialog.this,
+										"A java runnable file is required.",
+										"Error", JOptionPane.ERROR_MESSAGE);
+						}	
+						else if (inputFile == null || !inputFile.isFile()) {
+							inputFile = new File(txtInput.getText());
+							if (!inputFile.isFile())
+								JOptionPane.showMessageDialog(AddJobDialog.this,
+										"A input file is required.",
+										"Error", JOptionPane.ERROR_MESSAGE);
+						}	
+						else {
+							master.addJob(runnableFile, inputFile);
+							setVisible(false);
+							dispose();
+						}
 					}
 				});
 				buttonPane.add(okButton);
@@ -117,7 +143,7 @@ public class AddJobDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
-					
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						setVisible(false);

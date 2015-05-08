@@ -58,6 +58,17 @@ public class Main {
 		});
 		frame.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		frame.getContentPane().add(btnAddAJob);
+		
+		JButton button = new JButton("Add a Worker");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AddWorkerDialog dialog = new AddWorkerDialog(master);
+				dialog.pack();
+				dialog.setLocationRelativeTo(frame);
+				dialog.setVisible(true);		
+			}
+		});
+		frame.getContentPane().add(button);
 	}
 
 }

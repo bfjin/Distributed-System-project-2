@@ -22,8 +22,14 @@ public class Master {
 		worker.doJob(job);
 	}
 
+	public void addWorker(String address, int port) {
+		Worker worker = new Worker(address, port);		
+		workers.add(worker);
+	}
+	
 	private Worker findWorker(ArrayList<Worker> workers) {
-		// TODO
+		// TODO round robin
 		return workers.get(0);
 	}
+
 }
