@@ -15,30 +15,23 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import master.Master;
+
 public class AddJobDialog extends JDialog {
 
 	private static final long serialVersionUID = -1382469568373074545L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtRunable;
 	private JTextField txtInput;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			AddJobDialog dialog = new AddJobDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
+	
+	private File runnableFile;
+	private File inputFile;
+	
 	/**
 	 * Create the dialog.
+	 * @param master 
 	 */
-	public AddJobDialog() {
+	public AddJobDialog(Master master) {
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
@@ -65,8 +58,8 @@ public class AddJobDialog extends JDialog {
 						fc.setFileFilter(new FileNameExtensionFilter("Java Runnable file (.jar)", "jar"));								
 						int returnVal = fc.showOpenDialog(AddJobDialog.this);
 						if (returnVal == JFileChooser.APPROVE_OPTION) {
-			                File file = fc.getSelectedFile();
-			                txtRunable.setText(file.getPath());
+							runnableFile = fc.getSelectedFile();
+			                txtRunable.setText(runnableFile.getPath());
 						}
 					}
 				});
@@ -94,8 +87,8 @@ public class AddJobDialog extends JDialog {
 						fc.setDialogTitle("Select Input File For Job");
 						int returnVal = fc.showOpenDialog(AddJobDialog.this);
 						if (returnVal == JFileChooser.APPROVE_OPTION) {
-			                File file = fc.getSelectedFile();
-			                txtInput.setText(file.getPath());
+							inputFile = fc.getSelectedFile();
+			                txtInput.setText(inputFile.getPath());
 						}
 					}
 				});
@@ -108,12 +101,29 @@ public class AddJobDialog extends JDialog {
 			{
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
+				okButton.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						master.addJob(runnableFile, inputFile);
+						setVisible(false);
+						dispose();
+					}
+				});
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						setVisible(false);
+						dispose();
+					}
+				});
 				buttonPane.add(cancelButton);
 			}
 		}

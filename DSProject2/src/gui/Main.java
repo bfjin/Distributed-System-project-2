@@ -8,9 +8,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import master.Master;
+
 public class Main {
 
 	private JFrame frame;
+	private Master master;
 
 	/**
 	 * Launch the application.
@@ -25,13 +28,14 @@ public class Main {
 					e.printStackTrace();
 				}
 			}
-		});
+		});		
 	}
 
 	/**
 	 * Create the application.
 	 */
 	public Main() {
+		master = new Master();
 		initialize();
 	}
 
@@ -46,10 +50,10 @@ public class Main {
 		JButton btnAddAJob = new JButton("Add a Job");
 		btnAddAJob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddJobDialog dialog = new AddJobDialog();
+				AddJobDialog dialog = new AddJobDialog(master);
 				dialog.pack();
 				dialog.setLocationRelativeTo(frame);
-				dialog.setVisible(true);
+				dialog.setVisible(true);				
 			}
 		});
 		frame.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
