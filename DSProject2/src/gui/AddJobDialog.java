@@ -130,7 +130,8 @@ public class AddJobDialog extends JDialog {
 										"Error", JOptionPane.ERROR_MESSAGE);
 						}	
 						else {
-							master.addJob(runnableFile, inputFile);
+							//TODO Job Name
+							master.addJob("TODO", runnableFile, inputFile);
 							setVisible(false);
 							dispose();
 						}

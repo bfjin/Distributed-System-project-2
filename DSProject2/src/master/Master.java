@@ -15,11 +15,11 @@ public class Master {
 		workers.add(new Worker("127.0.0.1", 4444));
 	}
 	
-	public void addJob(File runnableFile, File inputFile){
-		Job job = new Job(this, runnableFile, inputFile);
+	public void addJob(String name ,File runnableFile, File inputFile){
+		Job job = new Job(name, runnableFile, inputFile);
 		jobs.add(job);
-		Worker worker = findWorker(workers);
-		worker.doJob(job);
+		job.setWorker(selectWorker(workers));
+		job.run();
 	}
 
 	public void addWorker(String address, int port) {
@@ -27,8 +27,8 @@ public class Master {
 		workers.add(worker);
 	}
 	
-	private Worker findWorker(ArrayList<Worker> workers) {
-		// TODO round robin
+	private Worker selectWorker(ArrayList<Worker> workers) {
+		// TODO select a worker
 		return workers.get(0);
 	}
 
