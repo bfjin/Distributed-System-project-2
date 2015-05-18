@@ -16,6 +16,7 @@ public class Job extends Thread {
 	private File runnableFile;
 	private File inputFile;
 	private Worker worker;
+	// 0 = Disconnected, 1 = Running, 2 = Finished, 3 = Failed
 	private int status;
 
 	public Job(String name, File runnableFile, File inputFile) {
@@ -23,6 +24,7 @@ public class Job extends Thread {
 		this.name = name;
 		this.runnableFile = runnableFile;
 		this.inputFile = inputFile;
+		status = 0;
 	}
 
 	public Worker getWorker() {
@@ -42,7 +44,9 @@ public class Job extends Thread {
 		obj.put("InputFile", fileToByteString(inputFile));
 		String data = obj.toJSONString();
 		worker.send(data);		
+		status = 1;
 		worker.receive();
+		// TODO handle reply
 	}
 
 	public String fileToByteString(File file) {

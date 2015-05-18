@@ -19,7 +19,7 @@ public class Master {
 		Job job = new Job(name, runnableFile, inputFile);
 		jobs.add(job);
 		job.setWorker(selectWorker(workers));
-		job.run();
+		job.start();
 	}
 
 	public void addWorker(String address, int port) {
