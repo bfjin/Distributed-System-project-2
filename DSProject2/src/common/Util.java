@@ -57,13 +57,14 @@ public class Util {
 	public static void sendFile(DataOutputStream out, File file) {
 		System.out.println("Send File: " + file.getPath());
 		try {
-			int length = (int) file.length();
-			out.writeInt(length);
-			byte[] bytes = new byte[length];
+			byte[] buffer = new byte[8192];
 			BufferedInputStream bis = new BufferedInputStream(
 					new FileInputStream(file));
-			bis.read(bytes);
-			out.write(bytes);
+			BufferedOutputStream bos = new BufferedOutputStream(out);
+			int len = 0;
+			while ((len = bis.read(buffer)) > 0) {
+				bos.write(buffer, 0, len);
+			}
 			bis.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -74,11 +75,14 @@ public class Util {
 	public static File receiveFile(DataInputStream in, File file) {
 		System.out.println("Receive File: " + file.getPath());
 		try {
-			int length = in.readInt();
-			byte[] bytes = new byte[length];
-			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-			in.read(bytes);
-			bos.write(bytes);
+			byte[] buffer = new byte[8192];
+			BufferedInputStream bis = new BufferedInputStream(in);
+			BufferedOutputStream bos = new BufferedOutputStream(
+					new FileOutputStream(file));
+			int len = 0;
+			while ((len = bis.read(buffer)) > 0) {
+				bos.write(buffer, 0, len);
+			}
 			bos.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
