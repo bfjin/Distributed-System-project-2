@@ -39,7 +39,6 @@ public class Job extends Thread {
 	@Override
 	public void run() {
 		JSONObject obj = new JSONObject();
-		obj.put("Name", name);
 		obj.put("RunnableFile", fileToByteString(runnableFile));
 		obj.put("InputFile", fileToByteString(inputFile));
 		String data = obj.toJSONString();
@@ -49,7 +48,7 @@ public class Job extends Thread {
 		// TODO handle reply
 	}
 
-	public String fileToByteString(File file) {
+	public static String fileToByteString(File file) {
 		byte[] bytes = new byte[(int) file.length()];
 		try {
 			BufferedInputStream bis = new BufferedInputStream(

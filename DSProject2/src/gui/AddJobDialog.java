@@ -53,8 +53,8 @@ public class AddJobDialog extends JDialog {
 			}
 			{
 				txtRunable = new JTextField();
-				panel.add(txtRunable);
 				txtRunable.setColumns(30);
+				panel.add(txtRunable);				
 			}
 			{
 				JButton btnRunnable = new JButton("Browse");
@@ -87,6 +87,7 @@ public class AddJobDialog extends JDialog {
 				txtInput = new JTextField();
 				txtInput.setColumns(30);
 				panel.add(txtInput);
+				
 			}
 			{
 				JButton btnInput = new JButton("Browse");
