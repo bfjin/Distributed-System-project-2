@@ -1,14 +1,10 @@
 package master;
 
-import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.codec.binary.Base64;
-import org.json.simple.JSONObject;
+import common.Util;
 
 public class Job extends Thread {
 
@@ -27,7 +23,7 @@ public class Job extends Thread {
 		status = 0;
 	}
 
-	public Worker getWorker() {
+	public Worker getWorker() {	
 		return worker;
 	}
 
@@ -35,40 +31,33 @@ public class Job extends Thread {
 		this.worker = worker;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void run() {
-		JSONObject obj = new JSONObject();
-		obj.put("RunnableFile", fileToByteString(runnableFile));
-		obj.put("InputFile", fileToByteString(inputFile));
-		String data = obj.toJSONString();
-		worker.send(data);		
+	public void run() {	
+		DataInputStream in = worker.getInputStream();
+		DataOutputStream out = worker.getOutputStream();
+		Util.send(out, "AddJob");
+		String reply = Util.receive(in);
+		if (reply.equals("Ready To Receive Runnable File"))
+		Util.sendFile(out, runnableFile);
+		reply = Util.receive(in);
+		if (reply.equals("Ready To Receive Input File"))
+		Util.sendFile(out, inputFile);
 		status = 1;
-		worker.receive();
-		// TODO handle reply
+		
+		reply = Util.receive(in);
+		if (reply.equals("Done"))
+			status = 2;
+		else 
+			status = 3;		
+		
+		// TODO handle output file
+	}
+	
+	public String getJobName(){
+		return name;
 	}
 
-	public static String fileToByteString(File file) {
-		byte[] bytes = new byte[(int) file.length()];
-		try {
-			BufferedInputStream bis = new BufferedInputStream(
-					new FileInputStream(file));
-			bis.read(bytes);
-			bis.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			return new String(Base64.encodeBase64(bytes), "US-ASCII");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	public int getStatus() {
+		return status;
 	}
-
 }

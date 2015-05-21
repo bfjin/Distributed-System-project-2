@@ -54,7 +54,8 @@ public class AddJobDialog extends JDialog {
 			{
 				txtRunable = new JTextField();
 				txtRunable.setColumns(30);
-				panel.add(txtRunable);				
+				panel.add(txtRunable);
+				txtRunable.setText("wordcount.jar");
 			}
 			{
 				JButton btnRunnable = new JButton("Browse");
@@ -87,7 +88,8 @@ public class AddJobDialog extends JDialog {
 				txtInput = new JTextField();
 				txtInput.setColumns(30);
 				panel.add(txtInput);
-				
+				txtInput.setText("sample-input.txt");
+
 			}
 			{
 				JButton btnInput = new JButton("Browse");
@@ -116,22 +118,21 @@ public class AddJobDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if (runnableFile == null || !runnableFile.isFile()) {
+						if (runnableFile == null)
 							runnableFile = new File(txtRunable.getText());
-							if (!runnableFile.isFile() || !runnableFile.getName().endsWith(".jar"))
-								JOptionPane.showMessageDialog(AddJobDialog.this,
-										"A java runnable file is required.",
-										"Error", JOptionPane.ERROR_MESSAGE);
-						}	
-						else if (inputFile == null || !inputFile.isFile()) {
+						if (inputFile == null)
 							inputFile = new File(txtInput.getText());
-							if (!inputFile.isFile())
-								JOptionPane.showMessageDialog(AddJobDialog.this,
-										"A input file is required.",
-										"Error", JOptionPane.ERROR_MESSAGE);
-						}	
+						if (!runnableFile.isFile()
+								|| !runnableFile.getName().endsWith(".jar"))
+							JOptionPane.showMessageDialog(AddJobDialog.this,
+									"A java runnable file is required.",
+									"Error", JOptionPane.ERROR_MESSAGE);
+						else if (!inputFile.isFile())
+							JOptionPane.showMessageDialog(AddJobDialog.this,
+									"A input file is required.", "Error",
+									JOptionPane.ERROR_MESSAGE);
 						else {
-							//TODO Job Name
+							// TODO Job Name
 							master.addJob("TODO", runnableFile, inputFile);
 							setVisible(false);
 							dispose();

@@ -41,28 +41,15 @@ public class Worker {
 		}
 	}
 
-	public void send(String data) {
-		try {
-			byte[] bytes = data.getBytes("utf-8");
-			out.writeInt(bytes.length);
-			out.write(bytes);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public DataInputStream getInputStream() {
+		return in;
 	}
 
-	public String receive() {
-		try {
-			int length = in.readInt();
-			byte[] bytes = new byte[length];
-			in.read(bytes);
-			return new String(bytes, "utf-8").trim();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	public DataOutputStream getOutputStream() {
+		return out;
 	}
 
+	public boolean isRunning() {
+		return running;
+	}
 }

@@ -20,7 +20,7 @@ public class Server {
 //			serverSocket = (SSLServerSocket) sslserversocketfactory
 //					.createServerSocket(serverPort);
 			serverSocket = new ServerSocket(serverPort);
-			
+			System.out.println("Server Started");
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 				Connection c = new Connection(clientSocket);
