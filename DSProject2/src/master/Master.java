@@ -15,7 +15,7 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		workers.add(new Worker("127.0.0.1", 4444));
+		workers.add(new Worker(this, "127.0.0.1", 4444));
 
 		Thread listenThread = new Thread(() -> listen(5555));
 		listenThread.setDaemon(true);
@@ -27,17 +27,25 @@ public class Master {
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
 		worker.send(job);
-		
+
 	}
 
 	public void addWorker(String address, int port) {
-		Worker worker = new Worker(address, port);
+		Worker worker = new Worker(this, address, port);
 		workers.add(worker);
 	}
 
 	private Worker selectWorker(ArrayList<Worker> workers) {
 		// TODO select a worker
 		return workers.get(0);
+	}
+
+	public Job findJobById(String jobId) {
+		for (Job job : jobs) {
+			if (job.getId().equals(jobId))
+				return job;
+		}
+		return null;
 	}
 
 	public void listen(int serverPort) {
@@ -58,5 +66,4 @@ public class Master {
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+public class Listener {
 
 //	private SSLServerSocket serverSocket;
 	private ServerSocket serverSocket;
 
 	public static void main(String args[]) {
-		new Server(4444);
+		new Listener(4444);
 	}
 
-	public Server(int serverPort) {
+	public Listener(int serverPort) {
 		try {
 //			SSLServerSocketFactory sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory
 //					.getDefault();

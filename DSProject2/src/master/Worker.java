@@ -2,14 +2,17 @@ package master;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import common.Instruction;
 import common.Util;
 
 public class Worker {
-
+	
+	private Master master;
 	private String address;
 	private int port;
 	private boolean running;
@@ -22,7 +25,8 @@ public class Worker {
 	private DataInputStream receiveIn;
 	private DataOutputStream receiveOut;
 
-	public Worker(String address, int port) {
+	public Worker(Master master, String address, int port) {
+		this.master = master;
 		this.address = address;
 		this.port = port;
 		connect();
@@ -44,19 +48,19 @@ public class Worker {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
 
 	public void send(Job job) {
-		Util.send(sendOut, "AddJob");
-		String reply = Util.receive(sendIn);
+		Util.send(sendOut, "AddJob", job.getId());
+		String reply = Util.receive(sendIn).getMessage();
 		if (reply.equals("Ready To Receive Runnable File"))
-		Util.sendFile(sendOut, job.getRunnableFile());
-		reply = Util.receive(sendIn);
+			Util.sendFile(sendOut, job.getRunnableFile());
+		reply = Util.receive(sendIn).getMessage();
 		if (reply.equals("Ready To Receive Input File"))
-		Util.sendFile(sendOut, job.getInputFile());
-		job.setStatus(1);		
+			Util.sendFile(sendOut, job.getInputFile());
+		job.setStatus(1);
 	}
-	
+
 	public boolean isRunning() {
 		return running;
 	}
@@ -78,15 +82,43 @@ public class Worker {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Thread listenThread = new Thread(() -> receiveData());
-		listenThread.setDaemon(true);
-		listenThread.start();
+		Thread receiveThread = new Thread(() -> receiveData());
+		receiveThread.setDaemon(true);
+		receiveThread.start();
 	}
 
 	private void receiveData() {
 		while (true) {
-			String data = Util.receive(receiveIn);	
-		}			
+			Instruction inst = Util.receive(receiveIn);
+			String message = inst.getMessage();
+			if (message.equals("Done")) {
+				Job job = master.findJobById(inst.getJobId());
+				job.setStatus(2);				
+				File resultFile = job.getResultFile();
+				Util.send(receiveOut, "Ready To Receive Result");
+				Util.receiveFile(receiveIn, resultFile);
+				try {
+					java.awt.Desktop.getDesktop().edit(resultFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else if (message.equals("Failed")) {
+				Job job = master.findJobById(inst.getJobId());
+				job.setStatus(3);				
+				File resultFile = job.getResultFile();
+				Util.send(receiveOut, "Ready To Receive Result");
+				Util.receiveFile(receiveIn, resultFile);
+				try {
+					java.awt.Desktop.getDesktop().edit(resultFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
 	}
 
 }

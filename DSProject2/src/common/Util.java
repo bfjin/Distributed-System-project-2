@@ -58,14 +58,12 @@ public class Util {
 		System.out.println("Send File: " + file.getPath());
 		try {
 			byte[] buffer = new byte[8192];
-			BufferedInputStream bis = new BufferedInputStream(
-					new FileInputStream(file));
-			BufferedOutputStream bos = new BufferedOutputStream(out);
+			FileInputStream in = new FileInputStream(file);
 			int len = 0;
-			while ((len = bis.read(buffer)) > 0) {
-				bos.write(buffer, 0, len);
+			while ((len = in.read(buffer)) > 0) {
+				out.write(buffer, 0, len);
 			}
-			bis.close();
+			in.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -76,14 +74,13 @@ public class Util {
 		System.out.println("Receive File: " + file.getPath());
 		try {
 			byte[] buffer = new byte[8192];
-			BufferedInputStream bis = new BufferedInputStream(in);
-			BufferedOutputStream bos = new BufferedOutputStream(
-					new FileOutputStream(file));
-			int len = 0;
-			while ((len = bis.read(buffer)) > 0) {
-				bos.write(buffer, 0, len);
-			}
-			bos.close();
+			FileOutputStream out = new FileOutputStream(file);
+			int len;
+			do {
+				len = in.read(buffer);
+				out.write(buffer, 0, len);
+			} while (len == 8192);
+			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -91,8 +88,13 @@ public class Util {
 		return file;
 	}
 
-	public static void send(DataOutputStream out, String data) {
+	public static void send(DataOutputStream out, String message) {
+		send(out, message, null);
+	}
+
+	public static void send(DataOutputStream out, String message, String jobId) {
 		try {
+			String data = new Instruction(message, jobId).toJson();
 			out.writeUTF(data);
 			System.out.println("Send: " + data);
 		} catch (IOException e) {
@@ -101,15 +103,34 @@ public class Util {
 		}
 	}
 
-	public static String receive(DataInputStream in) {
+	public static Instruction receive(DataInputStream in) {
 		try {
 			String data = in.readUTF();
-			System.out.println("Receive: " + data);
-			return data;
+			// TODO deal with receive file
+			if (data.length() < 1000) {
+				System.out.println("Receive: " + data);
+				return Instruction.fromJson(data);
+			}
+			else {
+				return new Instruction("");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static File createFile(String fileName, String folderPath){
+		File file = new File(folderPath + fileName);
+		try {
+			file.createNewFile();
+			return file;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 }
