@@ -16,7 +16,7 @@ public class JobTable extends JPanel {
 	private static final long serialVersionUID = 5099368265902004685L;
 	ArrayList<Job> jobs;
 	String[] columnNames = {"Job Name", "Job ID", "Status"};
-	Object[][] data = {{"No jobs", "N/A", "N/A"}};
+	String[][] data = {{"No jobs", "N/A", "N/A"}};
 	
 	public JobTable(Master master) {
 		jobs = master.getJobs();
@@ -24,6 +24,7 @@ public class JobTable extends JPanel {
 		final JTable table = new JTable(data, columnNames);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
+        table.setEnabled(false);
         
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane);
@@ -43,7 +44,7 @@ public class JobTable extends JPanel {
 			} else if (status == 3) {
 				tableStatus = "Failed";
 			}
-			data[count] = new Object[]{j.getJobName(), j.getId(), tableStatus};
+			data[count] = new String[]{j.getJobName(), j.getId(), tableStatus};
 			count++;
 		}
 		

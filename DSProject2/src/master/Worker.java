@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import common.Instruction;
 import common.JobInstruction;
@@ -25,11 +26,16 @@ public class Worker {
 	private Socket receiveSocket;
 	private DataInputStream receiveIn;
 	private DataOutputStream receiveOut;
+	
+	private ReentrantLock sendLock;
+	private ReentrantLock receiveLock;
 
 	public Worker(Master master, String address, int port) {
 		this.master = master;
 		this.address = address;
 		this.port = port;
+		sendLock = new ReentrantLock();
+		receiveLock = new ReentrantLock();
 		connect();
 	}
 
@@ -51,7 +57,8 @@ public class Worker {
 		}
 	}
 
-	public void send(Job job) {
+	public void sendJob(Job job) {
+		sendLock.lock();
 		Util.send(sendOut, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
 		String reply = Util.receive(sendIn).getMessage();
@@ -59,8 +66,18 @@ public class Worker {
 			Util.sendFile(sendOut, job.getRunnableFile());
 		reply = Util.receive(sendIn).getMessage();
 		if (reply.equals("Ready To Receive Input File"))
-			Util.sendFile(sendOut, job.getInputFile());
-		job.setStatus(1);
+			Util.sendFile(sendOut, job.getInputFile());		
+		reply = Util.receive(sendIn).getMessage();
+		if (reply.equals("File Received")){
+			job.setStatus(1);
+			sendLock.unlock();
+		}		
+	}
+	
+	public int getWorkLoad() {
+		Util.send(sendOut, "RequestWorkLoad");
+		String reply = Util.receive(sendIn).getMessage();
+		return Integer.parseInt(reply);
 	}
 
 	public boolean isRunning() {
@@ -96,6 +113,7 @@ public class Worker {
 	private void receiveData() {
 		while (true) {
 			Instruction inst = Util.receive(receiveIn);
+			receiveLock.lock();
 			String message = inst.getMessage();
 			if (message.equals("Done")) {
 				Job job = master
@@ -104,6 +122,8 @@ public class Worker {
 				File resultFile = job.getResultFile();
 				Util.send(receiveOut, "Ready To Receive Result");
 				Util.receiveFile(receiveIn, resultFile);
+				Util.send(receiveOut, "File Received");
+				receiveLock.unlock();
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {
@@ -117,6 +137,8 @@ public class Worker {
 				File resultFile = job.getResultFile();
 				Util.send(receiveOut, "Ready To Receive Result");
 				Util.receiveFile(receiveIn, resultFile);
+				Util.send(receiveOut, "File Received");
+				receiveLock.unlock();
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {

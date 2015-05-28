@@ -15,6 +15,9 @@ public class Main {
 	private JFrame frame;
 	private Master master;
 
+	String[] columnNames = { "Job Name", "Job ID", "Status" };
+	Object[][] data = { { "No jobs", "N/A", "N/A" } };
+
 	/**
 	 * Launch the application.
 	 */
@@ -28,14 +31,13 @@ public class Main {
 					e.printStackTrace();
 				}
 			}
-		});		
+		});
 	}
 
 	/**
 	 * Create the application.
 	 */
 	public Main() {
-		master = new Master();
 		initialize();
 	}
 
@@ -43,33 +45,36 @@ public class Main {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		master = new Master();
+
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		JButton btnAddAJob = new JButton("Add a Job");
 		btnAddAJob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AddJobDialog dialog = new AddJobDialog(master);
 				dialog.pack();
 				dialog.setLocationRelativeTo(frame);
-				dialog.setVisible(true);				
+				dialog.setVisible(true);
 			}
 		});
-		frame.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		frame.getContentPane().setLayout(
+				new FlowLayout(FlowLayout.CENTER, 5, 5));
 		frame.getContentPane().add(btnAddAJob);
-		
+
 		JButton button = new JButton("Add a Worker");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AddWorkerDialog dialog = new AddWorkerDialog(master);
 				dialog.pack();
 				dialog.setLocationRelativeTo(frame);
-				dialog.setVisible(true);		
+				dialog.setVisible(true);
 			}
 		});
 		frame.getContentPane().add(button);
-		
+
 		JButton btnShowJobsTable = new JButton("Show Job Statuses");
 		btnShowJobsTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -78,7 +83,7 @@ public class Main {
 			}
 		});
 		frame.getContentPane().add(btnShowJobsTable);
-		
+
 		JButton btnShowWorkersTable = new JButton("Show Worker Statuses");
 		btnShowWorkersTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -88,5 +93,4 @@ public class Main {
 		});
 		frame.getContentPane().add(btnShowWorkersTable);
 	}
-
 }

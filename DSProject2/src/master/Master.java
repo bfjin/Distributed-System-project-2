@@ -21,10 +21,10 @@ public class Master {
 		listenThread.start();
 	}
 
-	public void addJob(Job job) {		
+	public void addJob(Job job) {
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
-		worker.send(job);
+		worker.sendJob(job);
 	}
 
 	public void addWorker(String address, int port) {
@@ -33,8 +33,16 @@ public class Master {
 	}
 
 	private Worker selectWorker(ArrayList<Worker> workers) {
-		// TODO select a worker
-		return workers.get(0);
+		int min = -1;
+		Worker selected = null;
+		for (Worker worker : workers) {
+			int workload = worker.getWorkLoad();
+			if (workload > min) {
+				min = workload;
+				selected = worker;
+			}
+		}
+		return selected;
 	}
 
 	public Job findJobById(String jobId) {
@@ -44,11 +52,11 @@ public class Master {
 		}
 		return null;
 	}
-	
+
 	public ArrayList<Job> getJobs() {
 		return jobs;
 	}
-	
+
 	public ArrayList<Worker> getWorkers() {
 		return workers;
 	}

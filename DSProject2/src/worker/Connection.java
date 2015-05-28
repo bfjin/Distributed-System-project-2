@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import common.AddJobInstruction;
 import common.Instruction;
@@ -21,8 +22,13 @@ class Connection extends Thread {
 	private DataOutputStream sendOut;
 	private Socket sendSocket;
 
+	private ReentrantLock sendLock;
+	private ReentrantLock receiveLock;
+
 	public Connection(Socket socket) {
 		setDaemon(true);
+		sendLock = new ReentrantLock();
+		receiveLock = new ReentrantLock();
 		try {
 			receiveSocket = socket;
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
@@ -43,10 +49,15 @@ class Connection extends Thread {
 	public void run() {
 		while (true) {
 			Instruction inst = Util.receive(receiveIn);
+			receiveLock.lock();
 			String message = inst.getMessage();
 			if (message.equals("AddJob")) {
 				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
 				addJob(addJobInstruction);
+			}
+			if (message.equals("RequestWorkLoad")) {
+				Util.send(receiveOut, Listener.workload + "");
+				receiveLock.unlock();
 			}
 		}
 	}
@@ -69,10 +80,14 @@ class Connection extends Thread {
 		Util.send(receiveOut, "Ready To Receive Input File");
 		Util.receiveFile(receiveIn, inputFile);
 
+		Util.send(receiveOut, "File Received");
+		receiveLock.unlock();
+
 		Thread doJobThrad = new Thread(() -> doJob(inst, runnableFile,
 				inputFile, outputFile, errorFile));
 		doJobThrad.setDaemon(true);
 		doJobThrad.start();
+		Listener.workload++;
 	}
 
 	public void doJob(AddJobInstruction inst, File runnableFile,
@@ -103,19 +118,22 @@ class Connection extends Thread {
 			else
 				p.waitFor();
 
+			sendLock.lock();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(sendOut, "Failed", inst.getJobId());
 				String reply = Util.receive(sendIn).getMessage();
-				if (reply.equals("Ready To Receive Result")) {
+				if (reply.equals("Ready To Receive Result"))
 					Util.sendFile(sendOut, errorFile);
-				}
 			} else {
 				Util.send(sendOut, "Done", inst.getJobId());
 				String reply = Util.receive(sendIn).getMessage();
-				if (reply.equals("Ready To Receive Result")) {
+				if (reply.equals("Ready To Receive Result"))
 					Util.sendFile(sendOut, outputFile);
-				}
-
+			}
+			String reply = Util.receive(sendIn).getMessage();
+			if (reply.equals("File Received")) {
+				sendLock.unlock();
+				Listener.workload--;
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
