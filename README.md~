@@ -8,7 +8,7 @@
 * Allow to specify a maximum memory use when adding a job (extra) (Done)
 * GUI failure handling (user input validation)
 ### Use SSL in all communication between master and worker ###
-### Deploy workers to Nectar cloud ### (Done)
+### Deploy workers to Nectar cloud ###
 ### Fix file transfer via socket ### (Done)
 ### Exception and failure handling ###
 ### Test the concurrency ###
