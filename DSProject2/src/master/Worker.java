@@ -62,11 +62,13 @@ public class Worker {
 		Util.send(sendOut, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
 		String reply = Util.receive(sendIn).getMessage();
-		if (reply.equals("Ready To Receive Runnable File"))
+		if (reply.equals("Ready To Receive Runnable File")){
 			Util.sendFile(sendOut, job.getRunnableFile());
+		}
 		reply = Util.receive(sendIn).getMessage();
-		if (reply.equals("Ready To Receive Input File"))
-			Util.sendFile(sendOut, job.getInputFile());		
+		if (reply.equals("Ready To Receive Input File")){
+			Util.sendFile(sendOut, job.getInputFile());	
+		}
 		reply = Util.receive(sendIn).getMessage();
 		if (reply.equals("File Received")){
 			job.setStatus(1);
@@ -112,10 +114,13 @@ public class Worker {
 
 	private void receiveData() {
 		while (true) {
+			System.out.println("aaa");	
 			Instruction inst = Util.receive(receiveIn);
 			receiveLock.lock();
 			String message = inst.getMessage();
+			System.out.println("eee");	
 			if (message.equals("Done")) {
+				System.out.println("bbb");	
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
@@ -124,13 +129,14 @@ public class Worker {
 				Util.receiveFile(receiveIn, resultFile);
 				Util.send(receiveOut, "File Received");
 				receiveLock.unlock();
+				System.out.println("ccc");	
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else if (message.equals("Failed")) {
+			} else if (message.equals("Failed")) {				
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(3);
@@ -139,6 +145,7 @@ public class Worker {
 				Util.receiveFile(receiveIn, resultFile);
 				Util.send(receiveOut, "File Received");
 				receiveLock.unlock();
+				System.out.println("ddd");	
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {

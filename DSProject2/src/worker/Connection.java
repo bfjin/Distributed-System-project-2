@@ -36,7 +36,7 @@ class Connection extends Thread {
 
 			String masterAddress = receiveSocket.getInetAddress()
 					.getHostAddress();
-			sendSocket = new Socket(masterAddress, 5555);
+			sendSocket = new Socket(masterAddress, 4445);
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 		} catch (IOException e) {
@@ -92,7 +92,7 @@ class Connection extends Thread {
 
 	public void doJob(AddJobInstruction inst, File runnableFile,
 			File inputFile, File outputFile, File errorFile) {
-
+		System.out.println("aaa");		
 		String javaExePath = Paths
 				.get(System.getProperty("java.home"), "bin", "java")
 				.toAbsolutePath().toString();
@@ -110,31 +110,44 @@ class Connection extends Thread {
 		}
 		builder.redirectError(errorFile);
 		try {
+			
 			Process p = builder.start();
 			int timeLimit = inst.getTimeLimit();
 			boolean finished = true;
-			if (timeLimit != -1)
+			if (timeLimit != -1){
+				System.out.println("bbb2");	
 				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
-			else
+			}
+			else{
+				// This take like 1 miniute or longer
+				// BEAWARE
+				System.out.println("bbb1");
 				p.waitFor();
-
+			}
+			System.out.println("bbb0");
 			sendLock.lock();
+			
 			if (!finished || p.exitValue() != 0) {
 				Util.send(sendOut, "Failed", inst.getJobId());
 				String reply = Util.receive(sendIn).getMessage();
-				if (reply.equals("Ready To Receive Result"))
+				if (reply.equals("Ready To Receive Result")){
 					Util.sendFile(sendOut, errorFile);
+				}
 			} else {
 				Util.send(sendOut, "Done", inst.getJobId());
 				String reply = Util.receive(sendIn).getMessage();
-				if (reply.equals("Ready To Receive Result"))
+				if (reply.equals("Ready To Receive Result")){
 					Util.sendFile(sendOut, outputFile);
+				}
 			}
 			String reply = Util.receive(sendIn).getMessage();
+			System.out.println("xxx");
 			if (reply.equals("File Received")) {
 				sendLock.unlock();
 				Listener.workload--;
+				System.out.println("zzz");
 			}
+			System.out.println("zzz11");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch bloc
 			e.printStackTrace();

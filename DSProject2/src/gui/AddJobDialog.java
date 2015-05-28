@@ -179,10 +179,12 @@ public class AddJobDialog extends JDialog {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						String jobName = txtName.getText();
-						if (runnableFile == null)
+						if (runnableFile == null){
 							runnableFile = new File(txtRunable.getText());
-						if (inputFile == null)
+						}
+						if (inputFile == null){
 							inputFile = new File(txtInput.getText());
+						}
 
 						if (jobName == null || jobName.trim().isEmpty()) {
 							JOptionPane.showMessageDialog(AddJobDialog.this,
@@ -208,12 +210,14 @@ public class AddJobDialog extends JDialog {
 
 						int timeLimit = -1, memoryLimit = -1;
 						try {
-							if (!txtDeadline.getText().trim().isEmpty())
+							if (!txtDeadline.getText().trim().isEmpty()){
 								timeLimit = Integer.parseInt(txtDeadline
 										.getText());
-							if (!txtMemory.getText().trim().isEmpty())
+							}
+							if (!txtMemory.getText().trim().isEmpty()){
 								memoryLimit = Integer.parseInt(txtMemory
 										.getText());
+							}
 						} catch (NumberFormatException ex) {
 							JOptionPane.showMessageDialog(AddJobDialog.this,
 									"Time limit and memory limit must be integer.", "Error",

@@ -16,7 +16,7 @@ public class Master {
 
 		workers.add(new Worker(this, "127.0.0.1", 4444));
 
-		Thread listenThread = new Thread(() -> listen(5555));
+		Thread listenThread = new Thread(() -> listen(4445));
 		listenThread.setDaemon(true);
 		listenThread.start();
 	}
@@ -47,8 +47,9 @@ public class Master {
 
 	public Job findJobById(String jobId) {
 		for (Job job : jobs) {
-			if (job.getId().equals(jobId))
+			if (job.getId().equals(jobId)){
 				return job;
+			}
 		}
 		return null;
 	}
@@ -70,8 +71,9 @@ public class Master {
 				String address = workerSocket.getLocalAddress()
 						.getHostAddress();
 				for (Worker worker : workers) {
-					if (worker.getAddress().equals(address))
+					if (worker.getAddress().equals(address)){
 						worker.setReceiveSocket(workerSocket);
+					}
 				}
 			}
 		} catch (IOException e) {

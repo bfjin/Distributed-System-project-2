@@ -57,13 +57,17 @@ public class Util {
 	public static void sendFile(DataOutputStream out, File file) {
 		System.out.println("Send File: " + file.getPath());
 		try {
-			byte[] buffer = new byte[8192];
-			FileInputStream in = new FileInputStream(file);
+			byte [] bytearray  = new byte [8192];
+			FileInputStream fin = new FileInputStream(file);
 			int len = 0;
-			while ((len = in.read(buffer)) > 0) {
-				out.write(buffer, 0, len);
+			int totalBytesSent = 0;
+			out.writeLong(file.length());
+			while ((len = fin.read(bytearray)) > -1) {
+				out.write(bytearray, 0, len);
+				totalBytesSent += len;				
 			}
-			in.close();
+			System.err.println("totalBytesSent = " + totalBytesSent);		
+			fin.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,15 +76,24 @@ public class Util {
 
 	public static File receiveFile(DataInputStream in, File file) {
 		System.out.println("Receive File: " + file.getPath());
+
 		try {
-			byte[] buffer = new byte[8192];
-			FileOutputStream out = new FileOutputStream(file);
-			int len;
+			byte[] bytearray = new byte[8192];
+			FileOutputStream fos = new FileOutputStream(file);
+			int bytesRead = 0;
+			int totalBytesRead = 0;
+			long totalFileLength = in.readLong();
 			do {
-				len = in.read(buffer);
-				out.write(buffer, 0, len);
-			} while (len == 8192);
-			out.close();
+				//System.out.println(bytesRead);
+				bytesRead = in.read(bytearray, 0, bytearray.length);
+				//System.out.println(totalBytesRead);
+				if(bytesRead >= 0) {
+					totalBytesRead += bytesRead;
+					fos.write(bytearray, 0, bytesRead);
+				}
+			} while (totalBytesRead < totalFileLength);
+			System.out.println("totalBytesRead =  " + totalBytesRead);
+			fos.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,12 +143,15 @@ public class Util {
 			if (data.length() < 1000) {
 				System.out.println("Receive: " + data);
 				String type = Instruction.getTypefromJson(data);
-				if (type.equals("Instruction"))
+				if (type.equals("Instruction")){
 					return Instruction.fromJson(data);
-				if (type.equals("JobInstruction"))
+				}
+				if (type.equals("JobInstruction")){
 					return JobInstruction.fromJson(data);
-				if (type.equals("AddJobInstruction"))
+				}
+				if (type.equals("AddJobInstruction")){
 					return AddJobInstruction.fromJson(data);
+				}
 			}
 			return new Instruction("");
 		} catch (IOException e) {
