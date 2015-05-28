@@ -15,6 +15,8 @@ public class Master {
 		jobs = new ArrayList<Job>();
 
 		workers.add(new Worker(this, "127.0.0.1", 4444));
+		workers.add(new Worker(this, "127.0.0.2", 4444));
+		workers.add(new Worker(this, "127.0.0.3", 4444));
 
 		Thread listenThread = new Thread(() -> listen(4445));
 		listenThread.setDaemon(true);
@@ -24,6 +26,7 @@ public class Master {
 	public void addJob(Job job) {
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
+		System.err.println("workerid = " + worker.getWorkerID());
 		worker.sendJob(job);
 	}
 
@@ -32,6 +35,7 @@ public class Master {
 		workers.add(worker);
 	}
 
+	// something wrong here
 	private Worker selectWorker(ArrayList<Worker> workers) {
 		int min = -1;
 		Worker selected = null;

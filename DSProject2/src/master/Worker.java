@@ -30,6 +30,13 @@ public class Worker {
 	private ReentrantLock sendLock;
 	private ReentrantLock receiveLock;
 
+	private static int id = 1;
+	private int workerID;
+	
+	public int getWorkerID() {
+		return workerID;
+	}
+
 	public Worker(Master master, String address, int port) {
 		this.master = master;
 		this.address = address;
@@ -37,6 +44,8 @@ public class Worker {
 		sendLock = new ReentrantLock();
 		receiveLock = new ReentrantLock();
 		connect();
+		workerID = id;
+		id ++;
 	}
 
 	public void connect() {
