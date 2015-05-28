@@ -13,5 +13,5 @@
 ### Exception and failure handling ###
 ### Test the concurrency ###
 ### Add some documentation ###
-### Worker selection (job placement) with round robin or according to workload from each worker (extra) ### (Done)
-### Handle the deadline time and maximum memory when executing the job (extra) ### (Done)
+### Worker selection (job placement) with round robin or according to workload from each worker (extra) (Done) ###
+### Handle the deadline time and maximum memory when executing the job (extra) (Done) ### 
