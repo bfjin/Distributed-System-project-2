@@ -6,16 +6,12 @@ import org.json.simple.parser.ParseException;
 
 public class Instruction {
 
-	private String message;
-	private String jobId;
-
-	public Instruction(String msg, String jobId) {
-		this.message = msg;
-		this.jobId = jobId;
-	}
+	protected String message;
+	protected String type;
 
 	public Instruction(String msg) {
-		this(msg, null);
+		this.message = msg;
+		this.type = "Instruction";
 	}
 
 	/**
@@ -26,25 +22,17 @@ public class Instruction {
 	}
 
 	/**
-	 * @param message
-	 *            the message to set
+	 * @return the type
 	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	/**
-	 * @return the jobId
-	 */
-	public String getJobId() {
-		return jobId;
+	public String getType() {
+		return type;
 	}
 
 	@SuppressWarnings("unchecked")
 	public String toJson() {
 		JSONObject obj = new JSONObject();
 		obj.put("Message", message);
-		obj.put("JobId", jobId);
+		obj.put("Type", type);
 		return obj.toJSONString();
 	}
 
@@ -52,13 +40,23 @@ public class Instruction {
 		JSONParser parser = new JSONParser();
 		try {
 			JSONObject obj = (JSONObject) parser.parse(json);
-			return new Instruction((String) obj.get("Message"),
-					(String) obj.get("JobId"));
+			return new Instruction((String) obj.get("Message"));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
+	}
 
+	public static String getTypefromJson(String json) {
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject obj = (JSONObject) parser.parse(json);
+			return (String) obj.get("Type");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

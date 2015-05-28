@@ -12,6 +12,8 @@ public class Job {
 	private File runnableFile;
 	private File inputFile;
 	private File resultFile;
+	private int timeLimit;
+	private int memoryLimit;
 	
 	//0 = Disconnected, 1 = Running, 2 = Finished, 3 = Failed
 	private int status;
@@ -27,6 +29,9 @@ public class Job {
 		new File(folderPath).mkdirs();
 		folderPath += "\\";
 		resultFile = Util.createFile("result.txt", folderPath);
+		
+		timeLimit = -1;
+		memoryLimit = -1;
 	}
 	
 	public String getJobName(){
@@ -66,5 +71,33 @@ public class Job {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the timeLimit
+	 */
+	public int getTimeLimit() {
+		return timeLimit;
+	}
+
+	/**
+	 * @param timeLimit the timeLimit to set
+	 */
+	public void setTimeLimit(int timeLimit) {
+		this.timeLimit = timeLimit;
+	}
+
+	/**
+	 * @return the memoryLimit
+	 */
+	public int getMemoryLimit() {
+		return memoryLimit;
+	}
+
+	/**
+	 * @param memoryLimit the memoryLimit to set
+	 */
+	public void setMemoryLimit(int memoryLimit) {
+		this.memoryLimit = memoryLimit;
 	}
 }

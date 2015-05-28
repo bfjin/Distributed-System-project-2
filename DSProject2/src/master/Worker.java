@@ -8,10 +8,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import common.Instruction;
+import common.JobInstruction;
 import common.Util;
 
 public class Worker {
-	
+
 	private Master master;
 	private String address;
 	private int port;
@@ -51,7 +52,8 @@ public class Worker {
 	}
 
 	public void send(Job job) {
-		Util.send(sendOut, "AddJob", job.getId());
+		Util.send(sendOut, "AddJob", job.getId(), job.getTimeLimit(),
+				job.getMemoryLimit());
 		String reply = Util.receive(sendIn).getMessage();
 		if (reply.equals("Ready To Receive Runnable File"))
 			Util.sendFile(sendOut, job.getRunnableFile());
@@ -69,7 +71,6 @@ public class Worker {
 		return address;
 	}
 
-	
 	public int getPort() {
 		return port;
 	}
@@ -97,8 +98,22 @@ public class Worker {
 			Instruction inst = Util.receive(receiveIn);
 			String message = inst.getMessage();
 			if (message.equals("Done")) {
-				Job job = master.findJobById(inst.getJobId());
-				job.setStatus(2);				
+				Job job = master
+						.findJobById(((JobInstruction) inst).getJobId());
+				job.setStatus(2);
+				File resultFile = job.getResultFile();
+				Util.send(receiveOut, "Ready To Receive Result");
+				Util.receiveFile(receiveIn, resultFile);
+				try {
+					java.awt.Desktop.getDesktop().edit(resultFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if (message.equals("Failed")) {
+				Job job = master
+						.findJobById(((JobInstruction) inst).getJobId());
+				job.setStatus(3);
 				File resultFile = job.getResultFile();
 				Util.send(receiveOut, "Ready To Receive Result");
 				Util.receiveFile(receiveIn, resultFile);
@@ -109,20 +124,7 @@ public class Worker {
 					e.printStackTrace();
 				}
 			}
-			else if (message.equals("Failed")) {
-				Job job = master.findJobById(inst.getJobId());
-				job.setStatus(3);				
-				File resultFile = job.getResultFile();
-				Util.send(receiveOut, "Ready To Receive Result");
-				Util.receiveFile(receiveIn, resultFile);
-				try {
-					java.awt.Desktop.getDesktop().edit(resultFile);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
+
 		}
 	}
 

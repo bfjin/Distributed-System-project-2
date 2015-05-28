@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
+import common.AddJobInstruction;
 import common.Instruction;
 import common.Util;
 
@@ -43,12 +45,13 @@ class Connection extends Thread {
 			Instruction inst = Util.receive(receiveIn);
 			String message = inst.getMessage();
 			if (message.equals("AddJob")) {
-				addJob(inst);
+				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
+				addJob(addJobInstruction);
 			}
 		}
 	}
 
-	private void addJob(Instruction inst) {
+	private void addJob(AddJobInstruction inst) {
 		String jobId = inst.getJobId();
 		System.out.println("Job Id: " + jobId);
 		String folderPath = "Execution\\" + jobId;
@@ -66,41 +69,53 @@ class Connection extends Thread {
 		Util.send(receiveOut, "Ready To Receive Input File");
 		Util.receiveFile(receiveIn, inputFile);
 
-		Thread doJobThrad = new Thread(() -> doJob(jobId, runnableFile,
+		Thread doJobThrad = new Thread(() -> doJob(inst, runnableFile,
 				inputFile, outputFile, errorFile));
 		doJobThrad.setDaemon(true);
 		doJobThrad.start();
 	}
 
-	public void doJob(String jobId, File runnableFile, File inputFile,
-			File outputFile, File errorFile) {
+	public void doJob(AddJobInstruction inst, File runnableFile,
+			File inputFile, File outputFile, File errorFile) {
 
 		String javaExePath = Paths
 				.get(System.getProperty("java.home"), "bin", "java")
 				.toAbsolutePath().toString();
-
-		ProcessBuilder builder = new ProcessBuilder(javaExePath, "-jar",
-				runnableFile.getPath(), inputFile.getPath(),
-				outputFile.getPath());
+		int memoryLimit = inst.getMemoryLimit();
+		ProcessBuilder builder = null;
+		if (memoryLimit != -1) {
+			String memoryLimitArg = "-xmx" + memoryLimit + "m";
+			builder = new ProcessBuilder(javaExePath, "-jar",
+					runnableFile.getPath(), inputFile.getPath(),
+					outputFile.getPath(), memoryLimitArg);
+		} else {
+			builder = new ProcessBuilder(javaExePath, "-jar",
+					runnableFile.getPath(), inputFile.getPath(),
+					outputFile.getPath());
+		}
 		builder.redirectError(errorFile);
 		try {
 			Process p = builder.start();
-			int exit = p.waitFor();
+			int timeLimit = inst.getTimeLimit();
+			boolean finished = true;
+			if (timeLimit != -1)
+				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
+			else
+				p.waitFor();
 
-			// Handle Output File
-			if (exit == 0){
-				Util.send(sendOut, "Done", jobId);
+			if (!finished || p.exitValue() != 0) {
+				Util.send(sendOut, "Failed", inst.getJobId());
 				String reply = Util.receive(sendIn).getMessage();
-				if (reply.equals("Ready To Receive Result")){
-					Util.sendFile(sendOut, outputFile);
-				}
-			}
-			else {
-				Util.send(sendOut, "Failed", jobId);
-				String reply = Util.receive(sendIn).getMessage();
-				if (reply.equals("Ready To Receive Result")){
+				if (reply.equals("Ready To Receive Result")) {
 					Util.sendFile(sendOut, errorFile);
 				}
+			} else {
+				Util.send(sendOut, "Done", inst.getJobId());
+				String reply = Util.receive(sendIn).getMessage();
+				if (reply.equals("Ready To Receive Result")) {
+					Util.sendFile(sendOut, outputFile);
+				}
+
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

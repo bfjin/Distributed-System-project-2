@@ -89,12 +89,32 @@ public class Util {
 	}
 
 	public static void send(DataOutputStream out, String message) {
-		send(out, message, null);
+		try {
+			String data = new Instruction(message).toJson();
+			out.writeUTF(data);
+			System.out.println("Send: " + data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void send(DataOutputStream out, String message, String jobId) {
 		try {
-			String data = new Instruction(message, jobId).toJson();
+			String data = new JobInstruction(message, jobId).toJson();
+			out.writeUTF(data);
+			System.out.println("Send: " + data);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void send(DataOutputStream out, String message, String jobId,
+			int timeLimit, int memoryLimit) {
+		try {
+			String data = new AddJobInstruction(message, jobId, timeLimit,
+					memoryLimit).toJson();
 			out.writeUTF(data);
 			System.out.println("Send: " + data);
 		} catch (IOException e) {
@@ -109,19 +129,23 @@ public class Util {
 			// TODO deal with receive file
 			if (data.length() < 1000) {
 				System.out.println("Receive: " + data);
-				return Instruction.fromJson(data);
+				String type = Instruction.getTypefromJson(data);
+				if (type.equals("Instruction"))
+					return Instruction.fromJson(data);
+				if (type.equals("JobInstruction"))
+					return JobInstruction.fromJson(data);
+				if (type.equals("AddJobInstruction"))
+					return AddJobInstruction.fromJson(data);
 			}
-			else {
-				return new Instruction("");
-			}
+			return new Instruction("");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
-	public static File createFile(String fileName, String folderPath){
+
+	public static File createFile(String fileName, String folderPath) {
 		File file = new File(folderPath + fileName);
 		try {
 			file.createNewFile();
@@ -131,6 +155,6 @@ public class Util {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 	}
 }

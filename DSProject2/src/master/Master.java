@@ -1,6 +1,5 @@
 package master;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,8 +21,7 @@ public class Master {
 		listenThread.start();
 	}
 
-	public void addJob(String name, File runnableFile, File inputFile) {
-		Job job = new Job(name, runnableFile, inputFile);
+	public void addJob(Job job) {		
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
 		worker.send(job);
