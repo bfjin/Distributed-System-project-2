@@ -27,7 +27,6 @@ public class Master {
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
 		worker.send(job);
-
 	}
 
 	public void addWorker(String address, int port) {
@@ -46,6 +45,14 @@ public class Master {
 				return job;
 		}
 		return null;
+	}
+	
+	public ArrayList<Job> getJobs() {
+		return jobs;
+	}
+	
+	public ArrayList<Worker> getWorkers() {
+		return workers;
 	}
 
 	public void listen(int serverPort) {

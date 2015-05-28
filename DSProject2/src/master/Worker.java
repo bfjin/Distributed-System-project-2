@@ -69,6 +69,11 @@ public class Worker {
 		return address;
 	}
 
+	
+	public int getPort() {
+		return port;
+	}
+
 	public Socket getReceiveSocket() {
 		return receiveSocket;
 	}

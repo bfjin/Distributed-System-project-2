@@ -69,6 +69,24 @@ public class Main {
 			}
 		});
 		frame.getContentPane().add(button);
+		
+		JButton btnShowJobsTable = new JButton("Show Job Statuses");
+		btnShowJobsTable.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JobTable jobs = new JobTable(master);
+				jobs.setLocation(250, 250);
+			}
+		});
+		frame.getContentPane().add(btnShowJobsTable);
+		
+		JButton btnShowWorkersTable = new JButton("Show Worker Statuses");
+		btnShowWorkersTable.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				WorkerTable workers = new WorkerTable(master);
+				workers.setLocation(250, 250);
+			}
+		});
+		frame.getContentPane().add(btnShowWorkersTable);
 	}
 
 }
