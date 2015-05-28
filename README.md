@@ -9,6 +9,7 @@
 * GUI failure handling (user input validation)
 ### Use SSL in all communication between master and worker ###
 ### Deploy workers to Nectar cloud ###
+### Fix file transfer via socket ###
 ### Exception and failure handling ###
 ### Test the concurrency ###
 ### Add some documentation ###
