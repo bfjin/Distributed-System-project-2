@@ -14,10 +14,6 @@ public class Main {
 
 	private JFrame frame;
 	private Master master;
-
-	String[] columnNames = { "Job Name", "Job ID", "Status" };
-	Object[][] data = { { "No jobs", "N/A", "N/A" } };
-
 	/**
 	 * Launch the application.
 	 */
