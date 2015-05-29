@@ -69,9 +69,9 @@ class Connection extends Thread {
 	private void addJob(AddJobInstruction inst) {
 		String jobId = inst.getJobId();
 		System.out.println("Job Id: " + jobId);
-		String folderPath = "Execution\\" + jobId;
+		String folderPath = "Execution" + File.separator + jobId;
 		new File(folderPath).mkdirs();
-		folderPath += "\\";
+		folderPath += File.separator;
 
 		File runnableFile = Util.createFile("runnable.jar", folderPath);
 		File inputFile = Util.createFile("input.txt", folderPath);

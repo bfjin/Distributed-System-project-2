@@ -20,7 +20,7 @@ public class Listener {
 	public Listener(int serverPort) {
 		setWorkload(0);
 		try {
-			java.lang.System.setProperty("javax.net.ssl.keyStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.keyStore", "certificate");
 			java.lang.System.setProperty("javax.net.ssl.keyStorePassword", "123456");
 			
 			SSLServerSocketFactory sslServerSocketFactory = 

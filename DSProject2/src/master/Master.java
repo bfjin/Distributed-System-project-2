@@ -20,7 +20,6 @@ public class Master {
 		jobs = new ArrayList<Job>();
 
 		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket));
-		workers.add(new Worker(this, "127.0.0.2", Util.workerSocket));
 
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
@@ -74,7 +73,7 @@ public class Master {
 	public void listen(int serverPort) {
 		ServerSocket serverSocket;
 		try {
-			java.lang.System.setProperty("javax.net.ssl.keyStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.keyStore", "certificate");
 			java.lang.System.setProperty("javax.net.ssl.keyStorePassword", "123456");
 			
 			SSLServerSocketFactory sslServerSocketFactory = 

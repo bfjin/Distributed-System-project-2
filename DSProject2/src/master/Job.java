@@ -25,9 +25,9 @@ public class Job {
 		this.runnableFile = runnableFile;
 		this.inputFile = inputFile;
 		
-		String folderPath = "Result\\" + id;
+		String folderPath = "Result" + File.separator + id;
 		new File(folderPath).mkdirs();
-		folderPath += "\\";
+		folderPath += File.separator;
 		resultFile = Util.createFile("result.txt", folderPath);
 		
 		timeLimit = -1;
