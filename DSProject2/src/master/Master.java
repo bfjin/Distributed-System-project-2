@@ -24,7 +24,8 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
+		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
+		workers.add(new Worker(this, "146.118.97.86", Util.workerSocket, workerTable));
 		
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
@@ -50,7 +51,7 @@ public class Master {
 	public void addWorker(String address, int port) {
 		Worker worker = new Worker(this, address, port, workerTable);
 		workers.add(worker);
-		workerTable.updateTable();
+		//workerTable.updateTable();
 	}
 
 	// something wrong here
@@ -86,16 +87,10 @@ public class Master {
 	}
 
 	public void listen(int serverPort) {
-		ServerSocket serverSocket;
+		SSLServerSocket serverSocket;
 		try {
-			java.lang.System.setProperty("javax.net.ssl.keyStore", "certificate");
-			java.lang.System.setProperty("javax.net.ssl.keyStorePassword", "123456");
-			
-			SSLServerSocketFactory sslServerSocketFactory = 
-					(SSLServerSocketFactory) SSLServerSocketFactory
-					.getDefault();
-			serverSocket = (SSLServerSocket) sslServerSocketFactory
-					.createServerSocket(serverPort);
+			serverSocket = Util.getServerSocket("server.jks", serverPort);
+			serverSocket.setNeedClientAuth(true);  
 			while (true) {
 				SSLSocket workerSocket = (SSLSocket) serverSocket.accept();
 				String address = workerSocket.getLocalAddress()

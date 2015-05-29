@@ -6,6 +6,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.KeyStore;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManagerFactory;
 
 public class Util {
 
@@ -127,6 +135,48 @@ public class Util {
 			e.printStackTrace();
 			return null;
 		}
-
 	}
+	
+	 public static SSLServerSocket getServerSocket(String certName, int thePort){
+	    SSLServerSocket socket = null;
+	    try
+	    {
+		    //String key="SSLKey";  //要使用的证书名
+		    
+		    char keyStorePass[]="password".toCharArray();  //证书密码
+		    
+		    char keyPassword[]="password".toCharArray();  //证书别称所使用的主要密码
+		    
+		    KeyStore ks=KeyStore.getInstance("JKS");  //创建JKS密钥库
+		    
+		    ks.load(new FileInputStream(certName),keyStorePass);
+		    
+		    //创建管理JKS密钥库的X.509密钥管理器
+		    KeyManagerFactory kmf=KeyManagerFactory.getInstance("SunX509");
+		    
+		    kmf.init(ks,keyPassword);
+		    
+		    KeyStore tks = KeyStore.getInstance("JKS");  
+		    
+            tks.load(new FileInputStream(certName), keyStorePass);
+            
+            TrustManagerFactory tmf = TrustManagerFactory  
+                    .getInstance("SunX509");  
+            tmf.init(tks);  
+            
+            
+		    SSLContext sslContext = SSLContext.getInstance("SSL");
+		    
+		    sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),null);
+		    
+		    //根据上面配置的SSL上下文来产生SSLServerSocketFactory,与通常的产生方法不同
+		    SSLServerSocketFactory factory = sslContext.getServerSocketFactory();
+		    socket = (SSLServerSocket)factory.createServerSocket(thePort);
+
+	    
+	    }catch(Exception e){
+	    	System.out.println(e);
+	    }
+	    return socket;
+	 }
 }

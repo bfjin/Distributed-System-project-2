@@ -24,7 +24,7 @@ public class Worker {
 	private int port;
 	private boolean running;
 
-	private SSLSocket sendSocket;
+	private Socket sendSocket;
 	private DataInputStream sendIn;
 	private DataOutputStream sendOut;
 
@@ -58,12 +58,10 @@ public class Worker {
 
 	public void connect() {
 		try {
-			java.lang.System.setProperty("javax.net.ssl.trustStore", "certif");
-			java.lang.System.setProperty("javax.net.ssl.trustStorePassword", "123456");			
+
 			SSLSocketFactory sslSocketFactory = 
 					(SSLSocketFactory) SSLSocketFactory.getDefault();
-			sendSocket = 
-					(SSLSocket) sslSocketFactory.createSocket(address, port);
+			sendSocket = sslSocketFactory.createSocket(address, port);
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 			running = true;
