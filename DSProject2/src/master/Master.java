@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import common.Util;
+
 public class Master {
 
 	private ArrayList<Worker> workers;
@@ -14,11 +16,10 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		workers.add(new Worker(this, "127.0.0.1", 4444));
-		workers.add(new Worker(this, "127.0.0.2", 4444));
-		workers.add(new Worker(this, "127.0.0.3", 4444));
+		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket));
+		workers.add(new Worker(this, "127.0.0.2", Util.workerSocket));
 
-		Thread listenThread = new Thread(() -> listen(4445));
+		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
 		listenThread.start();
 	}
@@ -40,6 +41,7 @@ public class Master {
 		int min = -1;
 		Worker selected = null;
 		for (Worker worker : workers) {
+			System.err.println(worker.getWorkLoad());
 			int workload = worker.getWorkLoad();
 			if (workload > min) {
 				min = workload;
@@ -81,7 +83,7 @@ public class Master {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to establish connection with worker");
 			e.printStackTrace();
 		}
 	}

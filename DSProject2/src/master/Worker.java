@@ -60,8 +60,10 @@ public class Worker {
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 			running = true;
 		} catch (UnknownHostException e) {
+			System.err.println("Worker not found");
 			running = false;
 		} catch (IOException e) {
+			System.err.println("Failed to establish connection");
 			e.printStackTrace();
 		}
 	}
@@ -113,7 +115,7 @@ public class Worker {
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
 			receiveOut = new DataOutputStream(receiveSocket.getOutputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to create Data stream");
 			e.printStackTrace();
 		}
 		Thread receiveThread = new Thread(() -> receiveData());
@@ -142,7 +144,7 @@ public class Worker {
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					System.err.println("Failed to create result file");
 					e.printStackTrace();
 				}
 			} else if (message.equals("Failed")) {				
@@ -158,7 +160,7 @@ public class Worker {
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					System.err.println("Failed to create result file");
 					e.printStackTrace();
 				}
 			}

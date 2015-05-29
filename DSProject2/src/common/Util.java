@@ -14,7 +14,10 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.codec.binary.Base64;
 
 public class Util {
+	public static int masterSocket = 4445;
+	public static int workerSocket = 4444;
 
+	/*
 	public static String fileToByteString(File file) {
 		byte[] bytes = new byte[(int) file.length()];
 		try {
@@ -53,7 +56,7 @@ public class Util {
 		}
 		return file;
 	}
-
+	*/
 	public static void sendFile(DataOutputStream out, File file) {
 		System.out.println("Send File: " + file.getPath());
 		try {
@@ -69,7 +72,7 @@ public class Util {
 			System.err.println("totalBytesSent = " + totalBytesSent);		
 			fin.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when sending file");
 			e.printStackTrace();
 		}
 	}
@@ -95,7 +98,7 @@ public class Util {
 			System.out.println("totalBytesRead =  " + totalBytesRead);
 			fos.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when receiving file");
 			e.printStackTrace();
 		}
 		return file;
@@ -107,7 +110,7 @@ public class Util {
 			out.writeUTF(data);
 			System.out.println("Send: " + data);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when sending message");
 			e.printStackTrace();
 		}
 	}
@@ -118,7 +121,7 @@ public class Util {
 			out.writeUTF(data);
 			System.out.println("Send: " + data);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when sending message");
 			e.printStackTrace();
 		}
 	}
@@ -131,7 +134,7 @@ public class Util {
 			out.writeUTF(data);
 			System.out.println("Send: " + data);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when sending message");
 			e.printStackTrace();
 		}
 	}
@@ -155,7 +158,7 @@ public class Util {
 			}
 			return new Instruction("");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when receive instruction");
 			e.printStackTrace();
 			return null;
 		}
@@ -167,7 +170,7 @@ public class Util {
 			file.createNewFile();
 			return file;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed when creating file");
 			e.printStackTrace();
 			return null;
 		}
