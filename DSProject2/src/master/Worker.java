@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import common.Instruction;
 import common.JobInstruction;
 import common.Util;
@@ -50,12 +53,13 @@ public class Worker {
 
 	public void connect() {
 		try {
-			// SSLSocketFactory sslsocketfactory = (SSLSocketFactory)
-			// SSLSocketFactory
-			// .getDefault();
-			// socket = (SSLSocket) sslsocketfactory.createSocket(address,
-			// port);
-			sendSocket = new Socket(address, port);
+			java.lang.System.setProperty("javax.net.ssl.trustStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+			
+			SSLSocketFactory sslSocketFactory = 
+					(SSLSocketFactory) SSLSocketFactory.getDefault();
+			SSLSocket sendSocket = 
+					(SSLSocket) sslSocketFactory.createSocket(address, port);
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 			running = true;
