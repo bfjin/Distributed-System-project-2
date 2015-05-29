@@ -4,12 +4,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import common.AddJobInstruction;
 import common.Instruction;
@@ -18,11 +18,11 @@ import common.Util;
 class Connection extends Thread {
 	private DataInputStream receiveIn;
 	private DataOutputStream receiveOut;
-	private Socket receiveSocket;
+	private SSLSocket receiveSocket;
 
 	private DataInputStream sendIn;
 	private DataOutputStream sendOut;
-	private Socket sendSocket;
+	private SSLSocket sendSocket;
 
 	private ReentrantLock sendLock;
 	private ReentrantLock receiveLock;
@@ -40,7 +40,15 @@ class Connection extends Thread {
 
 			String masterAddress = receiveSocket.getInetAddress()
 					.getHostAddress();
-			sendSocket = new Socket(masterAddress, Util.masterSocket);
+			
+			java.lang.System.setProperty("javax.net.ssl.trustStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+			
+			SSLSocketFactory sslSocketFactory = 
+					(SSLSocketFactory) SSLSocketFactory.getDefault();
+			sendSocket = 
+					(SSLSocket) sslSocketFactory.createSocket(masterAddress, Util.masterSocket);
+			
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 		} catch (IOException e) {
@@ -48,7 +56,7 @@ class Connection extends Thread {
 			e.printStackTrace();
 		}
 	}
-
+	
 	@Override
 	public void run() {
 		while (true) {
