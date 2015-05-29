@@ -12,6 +12,7 @@
 ### Fix file transfer via socket ### (Done)
 ### Exception and failure handling ###
 ### Test the concurrency ###
-### Add some documentation ###
+### Add documentation for the code###
+### 1500 words Report ###
 ### Worker selection (job placement) with round robin or according to workload from each worker (extra) (Done) ###
-### Handle the deadline time and maximum memory when executing the job (extra) (Done) ### 
+### Handle the deadline time and maximum memory when executing the job (extra) (Done) ###
