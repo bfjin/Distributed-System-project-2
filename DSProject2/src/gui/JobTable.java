@@ -16,12 +16,14 @@ public class JobTable extends JPanel {
 	private static final long serialVersionUID = 5099368265902004685L;
 	ArrayList<Job> jobs;
 	String[] columnNames = {"Job Name", "Job ID", "Status"};
-	String[][] data = {{"No jobs", "N/A", "N/A"}};
+	Object[][] data = new Object[50][3];
+	JTable table;
 	
 	public JobTable(Master master) {
 		jobs = master.getJobs();
 		
-		final JTable table = new JTable(data, columnNames);
+		data[0] = new Object[]{"No jobs", "N/A", "N/A"};
+		table = new JTable(data, columnNames);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
         table.setEnabled(false);
@@ -31,6 +33,17 @@ public class JobTable extends JPanel {
         
 		JFrame frame = new JFrame("JobsTable");
 		
+        //Create and set up the content pane.
+        JobTable newContentPane = this;
+        newContentPane.setOpaque(true); //content panes must be opaque
+        frame.setContentPane(newContentPane);
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+	}
+	
+	public void updateTable() {
 		int count = 0;
 		String tableStatus = "";
 		for (Job j : jobs) {
@@ -47,14 +60,6 @@ public class JobTable extends JPanel {
 			data[count] = new String[]{j.getJobName(), j.getId(), tableStatus};
 			count++;
 		}
-		
-        //Create and set up the content pane.
-        JobTable newContentPane = this;
-        newContentPane.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(newContentPane);
-
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
+		table.repaint();
 	}
 }
