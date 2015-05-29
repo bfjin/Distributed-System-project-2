@@ -7,7 +7,7 @@
 * Allow to specify a deadline time when adding a job (extra) (Done)
 * Allow to specify a maximum memory use when adding a job (extra) (Done)
 * GUI failure handling (user input validation)
-### Use SSL in all communication between master and worker ###
+### Use SSL in all communication between master and worker ### (Done)
 ### Deploy workers to Nectar cloud ### (Done)
 ### Fix file transfer via socket ### (Done)
 ### Exception and failure handling ###
