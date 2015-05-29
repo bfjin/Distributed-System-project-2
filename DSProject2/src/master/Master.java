@@ -15,8 +15,8 @@ public class Master {
 		jobs = new ArrayList<Job>();
 
 		workers.add(new Worker(this, "127.0.0.1", 4444));
-		workers.add(new Worker(this, "127.0.0.2", 4444));
-		workers.add(new Worker(this, "127.0.0.3", 4444));
+//		workers.add(new Worker(this, "127.0.0.2", 4444));
+//		workers.add(new Worker(this, "127.0.0.3", 4444));
 
 		Thread listenThread = new Thread(() -> listen(4445));
 		listenThread.setDaemon(true);

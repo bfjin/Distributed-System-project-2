@@ -1,58 +1,13 @@
 package common;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import org.apache.commons.codec.binary.Base64;
 
 public class Util {
-
-	public static String fileToByteString(File file) {
-		byte[] bytes = new byte[(int) file.length()];
-		try {
-			BufferedInputStream bis = new BufferedInputStream(
-					new FileInputStream(file));
-			bis.read(bytes);
-			bis.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			return new String(Base64.encodeBase64(bytes), "US-ASCII");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public static File bytesStringToFile(File file, String string) {
-		try {
-			BufferedOutputStream bos = new BufferedOutputStream(
-					new FileOutputStream(file));
-			bos.write(Base64.decodeBase64(string));
-			bos.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return file;
-	}
 
 	public static void sendFile(DataOutputStream out, File file) {
 		System.out.println("Send File: " + file.getPath());
@@ -84,9 +39,7 @@ public class Util {
 			int totalBytesRead = 0;
 			long totalFileLength = in.readLong();
 			do {
-				//System.out.println(bytesRead);
 				bytesRead = in.read(bytearray, 0, bytearray.length);
-				//System.out.println(totalBytesRead);
 				if(bytesRead >= 0) {
 					totalBytesRead += bytesRead;
 					fos.write(bytearray, 0, bytesRead);

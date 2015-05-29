@@ -119,7 +119,7 @@ class Connection extends Thread {
 				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
 			}
 			else{
-				// This take like 1 miniute or longer
+				// This take like 1 minute or longer
 				// BEAWARE
 				System.out.println("bbb1");
 				p.waitFor();
