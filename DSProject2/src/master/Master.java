@@ -24,7 +24,7 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket));
+		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
 		
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);

@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import master.Worker;
 import master.Master;
+import master.Worker;
 
 public class WorkerTable extends JPanel {
 
