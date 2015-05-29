@@ -75,7 +75,8 @@ public class Main {
 		btnShowJobsTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JobTable jobs = new JobTable(master);
-				jobs.setLocation(250, 250);
+				jobs.updateTable();
+				master.setJobTable(jobs);
 			}
 		});
 		frame.getContentPane().add(btnShowJobsTable);
@@ -84,7 +85,8 @@ public class Main {
 		btnShowWorkersTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				WorkerTable workers = new WorkerTable(master);
-				workers.setLocation(250, 250);
+				workers.updateTable();
+				master.setWorkerTable(workers);
 			}
 		});
 		frame.getContentPane().add(btnShowWorkersTable);

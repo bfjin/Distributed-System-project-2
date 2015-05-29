@@ -1,5 +1,7 @@
 package master;
 
+import gui.JobTable;
+
 import java.io.File;
 import java.util.UUID;
 
@@ -14,6 +16,7 @@ public class Job {
 	private File resultFile;
 	private int timeLimit;
 	private int memoryLimit;
+	JobTable jobTable;
 	
 	//0 = Disconnected, 1 = Running, 2 = Finished, 3 = Failed
 	private int status;
@@ -34,7 +37,11 @@ public class Job {
 		memoryLimit = -1;
 	}
 	
-	public String getJobName(){
+	public void setJobTable(JobTable jobTable) {
+		this.jobTable = jobTable;
+	}
+	
+	public String getJobName() {
 		return name;
 	}
 
@@ -57,6 +64,9 @@ public class Job {
 
 	public void setStatus(int status) {
 		this.status = status;
+		if (this.jobTable != null) {
+			jobTable.updateTable();
+		}
 	}
 
 	/**

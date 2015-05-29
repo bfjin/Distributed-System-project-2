@@ -1,5 +1,7 @@
 package master;
 
+import gui.WorkerTable;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -39,14 +41,17 @@ public class Worker {
 	private static int id = 1;
 	private int workerID;
 	
+	WorkerTable workerTable;
+	
 	public int getWorkerID() {
 		return workerID;
 	}
 
-	public Worker(Master master, String address, int port) {
+	public Worker(Master master, String address, int port, WorkerTable workerTable) {
 		this.master = master;
 		this.address = address;
 		this.port = port;
+		this.workerTable = workerTable;
 		sendLock = new ReentrantLock();
 		receiveLock = new ReentrantLock();
 		connect();
@@ -65,9 +70,15 @@ public class Worker {
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 			running = true;
+			if (workerTable != null) {
+				workerTable.updateTable();
+			}
 		} catch (UnknownHostException e) {
 			System.err.println("Worker not found");
 			running = false;
+			if (workerTable != null) {
+				workerTable.updateTable();
+			}
 		} catch (IOException e) {
 			System.err.println("Failed to establish connection");
 			e.printStackTrace();

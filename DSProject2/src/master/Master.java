@@ -1,8 +1,10 @@
 package master;
 
+import gui.JobTable;
+import gui.WorkerTable;
+
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.net.ssl.SSLServerSocket;
@@ -15,17 +17,28 @@ public class Master {
 
 	private ArrayList<Worker> workers;
 	private ArrayList<Job> jobs;
+	JobTable jobTable;
+	WorkerTable workerTable;
 
 	public Master() {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket));
-		//workers.add(new Worker(this, "127.0.0.2", Util.workerSocket));
+
+		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, null));
+		//workers.add(new Worker(this, "127.0.0.2", Util.workerSocket, null));
 
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
 		listenThread.start();
+	}
+	
+	public void setJobTable(JobTable jobTable) {
+		this.jobTable = jobTable;
+	}
+	
+	public void setWorkerTable(WorkerTable workerTable) {
+		this.workerTable = workerTable;
 	}
 
 	public void addJob(Job job) {
@@ -33,11 +46,13 @@ public class Master {
 		Worker worker = selectWorker(workers);
 		System.err.println("workerid = " + worker.getWorkerID());
 		worker.sendJob(job);
+		jobTable.updateTable();
 	}
 
 	public void addWorker(String address, int port) {
-		Worker worker = new Worker(this, address, port);
+		Worker worker = new Worker(this, address, port, workerTable);
 		workers.add(worker);
+		workerTable.updateTable();
 	}
 
 	// something wrong here
