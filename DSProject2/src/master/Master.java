@@ -5,6 +5,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+
 import common.Util;
 
 public class Master {
@@ -71,9 +75,16 @@ public class Master {
 	public void listen(int serverPort) {
 		ServerSocket serverSocket;
 		try {
-			serverSocket = new ServerSocket(serverPort);
+			java.lang.System.setProperty("javax.net.ssl.keyStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+			
+			SSLServerSocketFactory sslServerSocketFactory = 
+					(SSLServerSocketFactory) SSLServerSocketFactory
+					.getDefault();
+			serverSocket = (SSLServerSocket) sslServerSocketFactory
+					.createServerSocket(serverPort);
 			while (true) {
-				Socket workerSocket = serverSocket.accept();
+				SSLSocket workerSocket = (SSLSocket) serverSocket.accept();
 				String address = workerSocket.getLocalAddress()
 						.getHostAddress();
 				for (Worker worker : workers) {

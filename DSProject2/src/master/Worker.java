@@ -112,7 +112,7 @@ public class Worker {
 		return receiveSocket;
 	}
 
-	public void setReceiveSocket(Socket receiveSocket) {
+	public void setReceiveSocket(SSLSocket receiveSocket) {
 		this.receiveSocket = receiveSocket;
 		try {
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
