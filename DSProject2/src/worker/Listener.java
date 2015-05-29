@@ -1,15 +1,16 @@
 package worker;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 
 import common.Util;
 
 public class Listener {
 
-//	private SSLServerSocket serverSocket;
-	private ServerSocket serverSocket;
+	private SSLServerSocket serverSocket;
 	private int workload; 
 
 	public static void main(String args[]) {
@@ -19,15 +20,17 @@ public class Listener {
 	public Listener(int serverPort) {
 		setWorkload(0);
 		try {
-//			SSLServerSocketFactory sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory
-//					.getDefault();
-//			serverSocket = (SSLServerSocket) sslserversocketfactory
-//					.createServerSocket(serverPort);
-			serverSocket = new ServerSocket(serverPort);
-
+			java.lang.System.setProperty("javax.net.ssl.keyStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+			
+			SSLServerSocketFactory sslServerSocketFactory = 
+					(SSLServerSocketFactory) SSLServerSocketFactory
+					.getDefault();
+			serverSocket = (SSLServerSocket) sslServerSocketFactory
+					.createServerSocket(serverPort);
 			System.out.println("Worker Started");
 			while (true) {			
-				Socket clientSocket = serverSocket.accept();
+				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
 				System.out.println("A new connection is detected");
 				Connection c = new Connection(clientSocket, this);
 				c.start();

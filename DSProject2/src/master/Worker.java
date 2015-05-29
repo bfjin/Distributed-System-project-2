@@ -10,10 +10,9 @@ import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import common.Instruction;
 import common.JobInstruction;
@@ -25,8 +24,8 @@ public class Worker {
 	private String address;
 	private int port;
 	private boolean running;
-	// private SSLSocket socket;
-	private Socket sendSocket;
+
+	private SSLSocket sendSocket;
 	private DataInputStream sendIn;
 	private DataOutputStream sendOut;
 
@@ -57,12 +56,12 @@ public class Worker {
 
 	public void connect() {
 		try {
-			// SSLSocketFactory sslsocketfactory = (SSLSocketFactory)
-			// SSLSocketFactory
-			// .getDefault();
-			// socket = (SSLSocket) sslsocketfactory.createSocket(address,
-			// port);
-			sendSocket = new Socket(address, port);
+			java.lang.System.setProperty("javax.net.ssl.trustStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.trustStorePassword", "123456");			
+			SSLSocketFactory sslSocketFactory = 
+					(SSLSocketFactory) SSLSocketFactory.getDefault();
+			sendSocket = 
+					(SSLSocket) sslSocketFactory.createSocket(address, port);
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 			running = true;
@@ -116,7 +115,7 @@ public class Worker {
 		return receiveSocket;
 	}
 
-	public void setReceiveSocket(Socket receiveSocket) {
+	public void setReceiveSocket(SSLSocket receiveSocket) {
 		this.receiveSocket = receiveSocket;
 		try {
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
@@ -175,6 +174,7 @@ public class Worker {
 		}
 	}
 	
+	/*
 	private SSLServerSocket getServerSocket(int thePort){
 	    SSLServerSocket socket = null;
 	    try{
@@ -209,5 +209,6 @@ public class Worker {
 	    
 	    return(socket);
     }
+	*/
 
 }

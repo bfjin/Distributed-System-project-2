@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLSocket;
+
 import common.AddJobInstruction;
 import common.Instruction;
 import common.Util;
@@ -26,7 +28,7 @@ class Connection extends Thread {
 	private ReentrantLock receiveLock;
 	private Listener worker;
 
-	public Connection(Socket socket, Listener worker) {
+	public Connection(SSLSocket socket, Listener worker) {
 		setDaemon(true);
 		this.worker = worker;
 		sendLock = new ReentrantLock();
