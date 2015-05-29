@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import common.Instruction;
 import common.JobInstruction;
 import common.Util;
@@ -18,8 +21,8 @@ public class Worker {
 	private String address;
 	private int port;
 	private boolean running;
-	// private SSLSocket socket;
-	private Socket sendSocket;
+
+	private SSLSocket sendSocket;
 	private DataInputStream sendIn;
 	private DataOutputStream sendOut;
 
@@ -50,18 +53,20 @@ public class Worker {
 
 	public void connect() {
 		try {
-			// SSLSocketFactory sslsocketfactory = (SSLSocketFactory)
-			// SSLSocketFactory
-			// .getDefault();
-			// socket = (SSLSocket) sslsocketfactory.createSocket(address,
-			// port);
-			sendSocket = new Socket(address, port);
+			java.lang.System.setProperty("javax.net.ssl.trustStore", "certif");
+			java.lang.System.setProperty("javax.net.ssl.trustStorePassword", "123456");			
+			SSLSocketFactory sslSocketFactory = 
+					(SSLSocketFactory) SSLSocketFactory.getDefault();
+			sendSocket = 
+					(SSLSocket) sslSocketFactory.createSocket(address, port);
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 			running = true;
 		} catch (UnknownHostException e) {
+			System.err.println("Worker not found");
 			running = false;
 		} catch (IOException e) {
+			System.err.println("Failed to establish connection");
 			e.printStackTrace();
 		}
 	}
@@ -113,7 +118,7 @@ public class Worker {
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
 			receiveOut = new DataOutputStream(receiveSocket.getOutputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to create Data stream");
 			e.printStackTrace();
 		}
 		Thread receiveThread = new Thread(() -> receiveData());
@@ -142,7 +147,7 @@ public class Worker {
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					System.err.println("Failed to create result file");
 					e.printStackTrace();
 				}
 			} else if (message.equals("Failed")) {				
@@ -158,7 +163,7 @@ public class Worker {
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					System.err.println("Failed to create result file");
 					e.printStackTrace();
 				}
 			}

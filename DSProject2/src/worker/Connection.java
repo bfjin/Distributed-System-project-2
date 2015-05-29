@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLSocket;
+
 import common.AddJobInstruction;
 import common.Instruction;
 import common.Util;
@@ -24,9 +26,11 @@ class Connection extends Thread {
 
 	private ReentrantLock sendLock;
 	private ReentrantLock receiveLock;
+	private Listener worker;
 
-	public Connection(Socket socket) {
+	public Connection(SSLSocket socket, Listener worker) {
 		setDaemon(true);
+		this.worker = worker;
 		sendLock = new ReentrantLock();
 		receiveLock = new ReentrantLock();
 		try {
@@ -36,11 +40,11 @@ class Connection extends Thread {
 
 			String masterAddress = receiveSocket.getInetAddress()
 					.getHostAddress();
-			sendSocket = new Socket(masterAddress, 4445);
+			sendSocket = new Socket(masterAddress, Util.masterSocket);
 			sendIn = new DataInputStream(sendSocket.getInputStream());
 			sendOut = new DataOutputStream(sendSocket.getOutputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to establish connection");
 			e.printStackTrace();
 		}
 	}
@@ -55,8 +59,8 @@ class Connection extends Thread {
 				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
 				addJob(addJobInstruction);
 			}
-			if (message.equals("RequestWorkLoad")) {
-				Util.send(receiveOut, Listener.workload + "");
+			else if (message.equals("RequestWorkLoad")) {
+				Util.send(receiveOut, worker.getWorkload() + "");
 				receiveLock.unlock();
 			}
 		}
@@ -87,7 +91,7 @@ class Connection extends Thread {
 				inputFile, outputFile, errorFile));
 		doJobThrad.setDaemon(true);
 		doJobThrad.start();
-		Listener.workload++;
+		worker.setWorkload(worker.getWorkload() + 1);
 	}
 
 	public void doJob(AddJobInstruction inst, File runnableFile,
@@ -144,15 +148,15 @@ class Connection extends Thread {
 			System.out.println("xxx");
 			if (reply.equals("File Received")) {
 				sendLock.unlock();
-				Listener.workload--;
+				worker.setWorkload(worker.getWorkload() - 1);
 				System.out.println("zzz");
 			}
 			System.out.println("zzz11");
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch bloc
+			System.err.println("Job interrupted");
 			e.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			System.err.println("Connection down");
 			e1.printStackTrace();
 		}
 
