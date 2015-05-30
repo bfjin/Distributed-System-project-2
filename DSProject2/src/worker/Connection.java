@@ -39,9 +39,11 @@ class Connection extends Thread {
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
 			receiveOut = new DataOutputStream(receiveSocket.getOutputStream());
 
-			String masterAddress = receiveSocket.getInetAddress()
-					.getHostAddress();
+			//String masterAddress = receiveSocket.getInetAddress()
+			//		.getHostAddress();
 			
+			String masterAddress = receiveSocket.getRemoteSocketAddress().toString();
+			System.err.println(masterAddress);
 			
 			sendSocket = new Socket(masterAddress, Util.masterSocket);
 
