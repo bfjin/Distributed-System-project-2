@@ -120,33 +120,21 @@ public class Worker {
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
 				File resultFile = job.getResultFile();
-				Util.send(out, "Ready To Receive Result");
+				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
-				Util.send(out, "File Received");
+				Util.send(out, "File Received", job.getId());
 				lock.unlock();
 				System.out.println("ccc");	
-				try {
-					java.awt.Desktop.getDesktop().edit(resultFile);
-				} catch (IOException e) {
-					System.err.println("Failed to create result file");
-					e.printStackTrace();
-				}
 			} else if (message.equals("Failed")) {				
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
-				Util.send(out, "Ready To Receive Result");
+				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
-				Util.send(out, "File Received");
+				Util.send(out, "File Received", job.getId());
 				lock.unlock();
 				System.out.println("ddd");	
-				try {
-					java.awt.Desktop.getDesktop().edit(resultFile);
-				} catch (IOException e) {
-					System.err.println("Failed to create result file");
-					e.printStackTrace();
-				}
 			}
 			else if (message.equals("Ready To Receive Runnable File")){
 				Util.sendFile(out, currentJob.getRunnableFile());

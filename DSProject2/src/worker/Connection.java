@@ -54,7 +54,10 @@ class Connection extends Thread {
 				jobExecutor.sendFile();
 			}
 			else if (message.equals("File Received")) {
-				// ToDO
+				JobInstruction jobInstruction = (JobInstruction) inst;
+				String jobId = jobInstruction.getJobId();
+				JobExecutor jobExecutor = findJobExcutorById(jobId);
+				jobExecutor.fileReceived();
 			}
 			else {
 				System.out.println("Unexpected message:  " + message);
@@ -63,7 +66,9 @@ class Connection extends Thread {
 	}
 
 	private JobExecutor findJobExcutorById(String jobId) {
-		// TODO Auto-generated method stub
+		for (JobExecutor jobExecutor : jobExecutors )
+			if (jobExecutor.getJobId().equals(jobId))
+				return jobExecutor;		
 		return null;
 	}
 
