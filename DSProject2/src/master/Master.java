@@ -42,7 +42,7 @@ public class Master {
 		Worker worker = selectWorker(workers);
 		System.err.println("workerid = " + worker.getWorkerID());
 		worker.sendJob(job);
-		jobTable.updateTable();
+		//jobTable.updateTable();
 	}
 
 	public void addWorker(String address, int port) {

@@ -12,6 +12,7 @@ import common.Util;
 
 public class JobExecutor extends Thread {
 
+	private String jobId;	
 	private DataOutputStream out;
 	private AddJobInstruction instruction;
 	private File runnableFile;
@@ -30,6 +31,7 @@ public class JobExecutor extends Thread {
 		this.outputFile = outputFile;
 		this.errorFile = errorFile;
 		this.lock = lock;
+		this.jobId = instruction.getJobId();
 	}
 
 	@Override
@@ -108,9 +110,15 @@ public class JobExecutor extends Thread {
 	}
 	
 	public void fileReceived() {
-//		lock.unlock();
-//	//	worker.setWorkload(worker.getWorkload() - 1);
-//		System.out.println("zzz");
+		lock.unlock();
+	//	worker.setWorkload(worker.getWorkload() - 1);
+		System.out.println("zzz");
 	}
 
+	/**
+	 * @return the jobId
+	 */
+	public String getJobId() {
+		return jobId;
+	}
 }
