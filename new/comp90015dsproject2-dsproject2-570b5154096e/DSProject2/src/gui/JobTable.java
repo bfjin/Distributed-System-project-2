@@ -59,11 +59,11 @@ public class JobTable extends JPanel {
 			}
 		};
 		
-		// Creates buttons on the fourth column for opening output file
+		// Creates buttons on the fourth column for opening output file.
 		@SuppressWarnings("unused")
 		ButtonColumn buttonColumn = new ButtonColumn(table, openOutputFile, 3);
 		
-		table.setPreferredScrollableViewportSize(new Dimension(500, 100));
+		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
         
         JScrollPane scrollPane = new JScrollPane(table);

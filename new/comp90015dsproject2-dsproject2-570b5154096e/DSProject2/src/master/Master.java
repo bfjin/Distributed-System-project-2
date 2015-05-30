@@ -8,6 +8,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+
 import common.Util;
 
 public class Master {
@@ -21,7 +25,7 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
+//		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
 		workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
 		
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
@@ -42,13 +46,13 @@ public class Master {
 		Worker worker = selectWorker(workers);
 		System.err.println("workerid = " + worker.getWorkerID());
 		worker.sendJob(job);
-		//jobTable.updateTable();
+		jobTable.updateTable();
 	}
 
 	public void addWorker(String address, int port) {
 		Worker worker = new Worker(this, address, port, workerTable);
 		workers.add(worker);
-		//workerTable.updateTable();
+		workerTable.updateTable();
 	}
 
 	// something wrong here

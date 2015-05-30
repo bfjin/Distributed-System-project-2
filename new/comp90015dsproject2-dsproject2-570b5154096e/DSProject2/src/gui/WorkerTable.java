@@ -30,7 +30,7 @@ public class WorkerTable extends JPanel {
 		
 		tableData[0] = new Object[]{"No workers", "N/A", "N/A"};
 		table = new JTable(new WorkerTableModel());
-		table.setPreferredScrollableViewportSize(new Dimension(500, 100));
+		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
         
         JScrollPane scrollPane = new JScrollPane(table);

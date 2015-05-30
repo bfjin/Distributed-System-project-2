@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import common.AddJobInstruction;
 import common.Instruction;
@@ -38,11 +39,9 @@ class Connection extends Thread {
 			receiveIn = new DataInputStream(receiveSocket.getInputStream());
 			receiveOut = new DataOutputStream(receiveSocket.getOutputStream());
 
-			//String masterAddress = receiveSocket.getInetAddress()
-			//		.getHostAddress();
+			String masterAddress = receiveSocket.getInetAddress()
+					.getHostAddress();
 			
-			String masterAddress = receiveSocket.getRemoteSocketAddress().toString();
-			System.err.println(masterAddress);
 			
 			sendSocket = new Socket(masterAddress, Util.masterSocket);
 
