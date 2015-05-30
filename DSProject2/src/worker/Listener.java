@@ -19,10 +19,10 @@ public class Listener {
 	public Listener(int serverPort) {
 		setWorkload(0);
 		try {			
-			@SuppressWarnings("resource")
-			ServerSocket serverSocket = new ServerSocket(serverPort);
-			//serverSocket = Util.getServerSocket(serverPort);
-			//serverSocket.setNeedClientAuth(true);  
+//			@SuppressWarnings("resource")
+//			ServerSocket serverSocket = new ServerSocket(serverPort);
+			ServerSocket serverSocket = Util.getServerSocket(serverPort);
+//			serverSocket.setNeedClientAuth(true);  
 			System.out.println("Worker Started");
 			while (true) {			
 				//SSLSocket clientSocket = (SSLSocket) serverSocket.accept();

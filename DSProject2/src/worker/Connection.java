@@ -59,26 +59,35 @@ class Connection extends Thread {
 	@Override
 	public void run() {
 		while (true) {
+			System.err.println("Worker standby");
 			Instruction inst = Util.receive(in);
 			lock.lock();
 			String message = inst.getMessage();
 			if (message.equals("AddJob")) {
+				System.out.println("Message:  " + message);
 				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
 				addJob(addJobInstruction);
 			} else if (message.equals("RequestWorkLoad")) {
+				System.out.println("Message:  " + message);
 				Util.send(out, worker.getWorkload() + "");
 				lock.unlock();
 			} else if (message.equals("Ready To Receive Result")) {
+				System.out.println("Message:  " + message);
 				JobInstruction jobInstruction = (JobInstruction) inst;
 				String jobId = jobInstruction.getJobId();
+				System.err.println(jobId);
 				JobExecutor jobExecutor = findJobExcutorById(jobId);
 				jobExecutor.sendFile();
+				System.err.println("ok");
+				lock.unlock();
+				
 			}
 			else if (message.equals("File Received")) {
-				JobInstruction jobInstruction = (JobInstruction) inst;
-				String jobId = jobInstruction.getJobId();
-				JobExecutor jobExecutor = findJobExcutorById(jobId);
-				jobExecutor.fileReceived();
+				//JobInstruction jobInstruction = (JobInstruction) inst;
+				//String jobId = jobInstruction.getJobId();
+				//JobExecutor jobExecutor = findJobExcutorById(jobId);
+				//jobExecutor.fileReceived();
+				System.out.println("Message:  " + message);
 			}
 			else {
 				System.out.println("Unexpected message:  " + message);
@@ -115,7 +124,7 @@ class Connection extends Thread {
 		lock.unlock();
 
 		JobExecutor jobExecutor = new JobExecutor(out, inst, runnableFile,
-				inputFile, outputFile, errorFile, lock);
+				inputFile, outputFile, errorFile);
 		jobExecutor.start();
 		jobExecutors.add(jobExecutor);
 		worker.setWorkload(worker.getWorkload() + 1);

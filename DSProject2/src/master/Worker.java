@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLSocketFactory;
+
 import common.Instruction;
 import common.JobInstruction;
 import common.Util;
@@ -25,6 +27,7 @@ public class Worker {
 	private DataOutputStream out;
 	
 	private ReentrantLock lock;
+	
 
 	private static int id = 1;
 	private int workerID;
@@ -48,19 +51,19 @@ public class Worker {
 		workerID = id;
 		id ++;
 		
-		//receiveThread = new Thread(() -> receiveData());
-		//receiveThread.setDaemon(true);
-		//receiveThread.start();
+		receiveThread = new Thread(() -> receiveData());
+		receiveThread.setDaemon(true);
+		receiveThread.start();
 	}
 
 	public void connect() {
 		try {
 
-//			SSLSocketFactory sslSocketFactory = 
-//					(SSLSocketFactory) SSLSocketFactory.getDefault();
-//			Socket socket = sslSocketFactory.createSocket(address, port);
-			@SuppressWarnings("resource")
-			Socket socket = new Socket(address, port);
+			SSLSocketFactory sslSocketFactory = 
+					(SSLSocketFactory) SSLSocketFactory.getDefault();
+			Socket socket = sslSocketFactory.createSocket(address, port);
+//			@SuppressWarnings("resource")
+//			Socket socket = new Socket(address, port);
 
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
@@ -81,10 +84,20 @@ public class Worker {
 	}
 
 	public void sendJob(Job job) {		
-		lock.lock();
+		System.err.println("Locked");
+		
+		
+		//lock.lock();
+		
+		
+		System.out.println("1");
 		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
-		currentJob = job;	
+		System.out.println("2");
+		currentJob = job;
+		System.err.println("Unlocked");
+		//lock.unlock();
+		System.out.println("Job sent 2");
 	}
 	
 	public int getWorkLoad() {		
@@ -110,13 +123,12 @@ public class Worker {
 
 	private void receiveData() {
 		while (true) {
-			System.out.println("aaa");	
+			System.err.println("Master standby");
 			Instruction inst = Util.receive(in);
+			System.err.println("Locked");
 			lock.lock();
 			String message = inst.getMessage();
-			System.out.println("eee");	
-			if (message.equals("Done")) {
-				System.out.println("bbb");	
+			if (message.equals("Done")) {			
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
@@ -124,8 +136,9 @@ public class Worker {
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
+				System.err.println("Unlocked");
 				lock.unlock();
-				System.out.println("ccc");	
+				System.out.println("message = " + message);	
 			} else if (message.equals("Failed")) {				
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
@@ -134,19 +147,24 @@ public class Worker {
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
+				System.err.println("Unlocked");
 				lock.unlock();
-				System.out.println("ddd");	
+				System.out.println("message = " + message);	
 			}
 			else if (message.equals("Ready To Receive Runnable File")){
 				Util.sendFile(out, currentJob.getRunnableFile());
+				System.out.println("message = " + message);	
 			}
 			else if (message.equals("Ready To Receive Input File")){
 				Util.sendFile(out, currentJob.getRunnableFile());
+				System.out.println("message = " + message);	
 			}
 			else if (message.equals("File Received")){
 				currentJob.setStatus(1);
+				System.err.println("Unlocked");
 				lock.unlock();
 				currentJob = null;
+				System.out.println("message = " + message);	
 			}
 			else {
 				System.out.println("Unexpected message:  " + message);

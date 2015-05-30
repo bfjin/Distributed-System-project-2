@@ -19,24 +19,21 @@ public class JobExecutor extends Thread {
 	private File inputFile;
 	private File outputFile;
 	private File errorFile;
-	private ReentrantLock lock;
 	private boolean error;
 
 	public JobExecutor(DataOutputStream out, AddJobInstruction inst, File runnableFile,
-			File inputFile, File outputFile, File errorFile, ReentrantLock lock) {
+			File inputFile, File outputFile, File errorFile) {
 		this.out = out;
 		this.instruction = inst;
 		this.runnableFile = runnableFile;
 		this.inputFile = inputFile;
 		this.outputFile = outputFile;
 		this.errorFile = errorFile;
-		this.lock = lock;
 		this.jobId = instruction.getJobId();
 	}
 
 	@Override
 	public void run() {
-		System.out.println("aaa");
 		String javaExePath = Paths
 				.get(System.getProperty("java.home"), "bin", "java")
 				.toAbsolutePath().toString();
@@ -59,16 +56,13 @@ public class JobExecutor extends Thread {
 			int timeLimit = instruction.getTimeLimit();
 			boolean finished = true;
 			if (timeLimit != -1) {
-				System.out.println("bbb2");
 				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
 			} else {
 				// This take like 1 minute or longer
 				// BEAWARE
-				System.out.println("bbb1");
 				p.waitFor();
 			}
-			System.out.println("bbb0");
-			lock.lock();
+			//lock.lock();
 			interrupt();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(out, "Failed", instruction.getJobId());
@@ -92,7 +86,7 @@ public class JobExecutor extends Thread {
 //			//	worker.setWorkload(worker.getWorkload() - 1);
 //				System.out.println("zzz");
 //			}
-			System.out.println("zzz11");
+			System.out.println("message = " + "aaa");		
 		} catch (InterruptedException e) {
 			System.err.println("Job interrupted");
 			e.printStackTrace();
@@ -103,16 +97,17 @@ public class JobExecutor extends Thread {
 	}
 	
 	public void sendFile(){
-		if (error)
+		if (error){
 			Util.sendFile(out, errorFile);
-		else 
+		}
+		else {
 			Util.sendFile(out, outputFile);
+		}
 	}
 	
 	public void fileReceived() {
-		lock.unlock();
+	//	lock.unlock();
 	//	worker.setWorkload(worker.getWorkload() - 1);
-		System.out.println("zzz");
 	}
 
 	/**

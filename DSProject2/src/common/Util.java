@@ -30,7 +30,7 @@ public class Util {
 				out.write(bytearray, 0, len);
 				totalBytesSent += len;				
 			}
-			System.err.println("totalBytesSent = " + totalBytesSent);		
+			System.out.println("totalBytesSent = " + totalBytesSent);		
 			fin.close();
 		} catch (IOException e) {
 			System.err.println("Failed when sending file");
@@ -99,8 +99,7 @@ public class Util {
 	}
 
 	public static Instruction receive(DataInputStream in) {
-		try {
-			System.err.println(in);
+		try {	
 			String data = in.readUTF();
 			// TODO deal with receive file
 			//if (data.length() < 1000) {
