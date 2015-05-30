@@ -25,8 +25,8 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
-		workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
+		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
+		//workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
 		
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
@@ -46,7 +46,7 @@ public class Master {
 		Worker worker = selectWorker(workers);
 		System.err.println("workerid = " + worker.getWorkerID());
 		worker.sendJob(job);
-		//jobTable.updateTable();
+		jobTable.updateTable();
 	}
 
 	public void addWorker(String address, int port) {
@@ -91,8 +91,10 @@ public class Master {
 		ServerSocket serverSocket;
 		try {
 			serverSocket = new ServerSocket (serverPort);
+			//serverSocket = Util.getServerSocket(serverPort);
 			//serverSocket.setNeedClientAuth(true);  
 			while (true) {
+				//SSLSocket workerSocket = (SSLSocket) serverSocket.accept();
 				Socket workerSocket = serverSocket.accept();
 				String address = workerSocket.getLocalAddress()
 						.getHostAddress();
