@@ -5,14 +5,14 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLSocket;
 
 import common.AddJobInstruction;
 import common.Instruction;
+import common.JobInstruction;
 import common.Util;
 
 class Connection extends Thread {
@@ -20,10 +20,12 @@ class Connection extends Thread {
 	private DataOutputStream out;
 	private ReentrantLock lock;
 	private Listener worker;
+	private ArrayList<JobExecutor> jobExecutors;
 
 	public Connection(Socket clientSocket, Listener worker) {
 		setDaemon(true);
 		this.worker = worker;
+		jobExecutors = new ArrayList<JobExecutor>();
 		lock = new ReentrantLock();
 		try {
 /*
@@ -66,10 +68,24 @@ class Connection extends Thread {
 			} else if (message.equals("RequestWorkLoad")) {
 				Util.send(out, worker.getWorkload() + "");
 				lock.unlock();
-			} else {
+			} else if (message.equals("Ready To Receive Result")) {
+				JobInstruction jobInstruction = (JobInstruction) inst;
+				String jobId = jobInstruction.getJobId();
+				JobExecutor jobExecutor = findJobExcutorById(jobId);
+				jobExecutor.sendFile();
+			}
+			else if (message.equals("File Received")) {
+				// ToDO
+			}
+			else {
 				System.out.println("Unexpected message:  " + message);
 			}
 		}
+	}
+
+	private JobExecutor findJobExcutorById(String jobId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private void addJob(AddJobInstruction inst) {
@@ -96,7 +112,7 @@ class Connection extends Thread {
 		JobExecutor jobExecutor = new JobExecutor(out, inst, runnableFile,
 				inputFile, outputFile, errorFile, lock);
 		jobExecutor.start();
-
+		jobExecutors.add(jobExecutor);
 		worker.setWorkload(worker.getWorkload() + 1);
 	}
 
