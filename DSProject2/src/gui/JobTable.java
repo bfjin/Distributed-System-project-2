@@ -59,7 +59,7 @@ public class JobTable extends JPanel {
 			}
 		};
 		
-		// Creates buttons on the fourth column for opening output file.
+		// Creates buttons on the fourth column for opening output file
 		@SuppressWarnings("unused")
 		ButtonColumn buttonColumn = new ButtonColumn(table, openOutputFile, 3);
 		
