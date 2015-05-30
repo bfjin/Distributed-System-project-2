@@ -19,6 +19,7 @@ public class JobExecutor extends Thread {
 	private File outputFile;
 	private File errorFile;
 	private ReentrantLock lock;
+	private boolean error;
 
 	public JobExecutor(DataOutputStream out, AddJobInstruction inst, File runnableFile,
 			File inputFile, File outputFile, File errorFile, ReentrantLock lock) {
@@ -69,24 +70,26 @@ public class JobExecutor extends Thread {
 			interrupt();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(out, "Failed", instruction.getJobId());
-				String reply = Util.receive(in).getMessage();
-				if (reply.equals("Ready To Receive Result")) {
-					Util.sendFile(out, errorFile);
-				}
+				error = true;
+//				String reply = Util.receive(in).getMessage();
+//				if (reply.equals("Ready To Receive Result")) {
+//					
+//				}
 			} else {
 				Util.send(out, "Done", instruction.getJobId());
-				String reply = Util.receive(in).getMessage();
-				if (reply.equals("Ready To Receive Result")) {
-					Util.sendFile(out, outputFile);
-				}
+				error = false;
+//				String reply = Util.receive(in).getMessage();
+//				if (reply.equals("Ready To Receive Result")) {
+//					Util.sendFile(out, outputFile);
+//				}
 			}
-			String reply = Util.receive(in).getMessage();
-			System.out.println("xxx");
-			if (reply.equals("File Received")) {
-				lock.unlock();
-			//	worker.setWorkload(worker.getWorkload() - 1);
-				System.out.println("zzz");
-			}
+//			String reply = Util.receive(in).getMessage();
+//			System.out.println("xxx");
+//			if (reply.equals("File Received")) {
+//				lock.unlock();
+//			//	worker.setWorkload(worker.getWorkload() - 1);
+//				System.out.println("zzz");
+//			}
 			System.out.println("zzz11");
 		} catch (InterruptedException e) {
 			System.err.println("Job interrupted");
@@ -95,6 +98,19 @@ public class JobExecutor extends Thread {
 			System.err.println("Connection down");
 			e1.printStackTrace();
 		}
+	}
+	
+	public void sendFile(){
+		if (error)
+			Util.sendFile(out, errorFile);
+		else 
+			Util.sendFile(out, outputFile);
+	}
+	
+	public void fileReceived() {
+//		lock.unlock();
+//	//	worker.setWorkload(worker.getWorkload() - 1);
+//		System.out.println("zzz");
 	}
 
 }
