@@ -3,9 +3,6 @@ package master;
 import gui.JobTable;
 import gui.WorkerTable;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import common.Util;
@@ -21,12 +18,8 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
-		workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
-		
-		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
-		listenThread.setDaemon(true);
-		listenThread.start();
+		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
+		//workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
 	}
 	
 	public void setJobTable(JobTable jobTable) {
@@ -53,17 +46,18 @@ public class Master {
 
 	// something wrong here
 	private Worker selectWorker(ArrayList<Worker> workers) {
-		int min = -1;
-		Worker selected = null;
-		for (Worker worker : workers) {
-			System.err.println(worker.getWorkLoad());
-			int workload = worker.getWorkLoad();
-			if (workload > min) {
-				min = workload;
-				selected = worker;
-			}
-		}
-		return selected;
+//		int min = -1;
+//		Worker selected = null;
+//		for (Worker worker : workers) {
+//			System.err.println(worker.getWorkLoad());
+//			int workload = worker.getWorkLoad();
+//			if (workload > min) {
+//				min = workload;
+//				selected = worker;
+//			}
+//		}
+//		return selected;
+		return workers.get(0);
 	}
 
 	public Job findJobById(String jobId) {
@@ -81,26 +75,5 @@ public class Master {
 
 	public ArrayList<Worker> getWorkers() {
 		return workers;
-	}
-
-	public void listen(int serverPort) {
-		ServerSocket serverSocket;
-		try {
-			serverSocket = new ServerSocket (serverPort);
-			//serverSocket.setNeedClientAuth(true);  
-			while (true) {
-				Socket workerSocket = serverSocket.accept();
-				String address = workerSocket.getLocalAddress()
-						.getHostAddress();
-				for (Worker worker : workers) {
-					if (worker.getAddress().equals(address)){
-						worker.setReceiveSocket(workerSocket);
-					}
-				}
-			}
-		} catch (IOException e) {
-			System.err.println("Failed to establish connection with worker");
-			e.printStackTrace();
-		}
 	}
 }
