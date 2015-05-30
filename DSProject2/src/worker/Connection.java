@@ -57,13 +57,6 @@ class Connection extends Thread {
 	@Override
 	public void run() {
 		while (true) {
-			while (lock.isLocked()) {
-				try {
-					sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
 			Instruction inst = Util.receive(in);
 			lock.lock();
 			String message = inst.getMessage();
@@ -73,11 +66,10 @@ class Connection extends Thread {
 			} else if (message.equals("RequestWorkLoad")) {
 				Util.send(out, worker.getWorkload() + "");
 				lock.unlock();
-			}
-			else {
+			} else {
 				System.out.println("Unexpected message:  " + message);
 			}
-		}		
+		}
 	}
 
 	private void addJob(AddJobInstruction inst) {
@@ -101,77 +93,11 @@ class Connection extends Thread {
 		Util.send(out, "File Received");
 		lock.unlock();
 
-		Thread doJobThrad = new Thread(() -> doJob(inst, runnableFile,
-				inputFile, outputFile, errorFile));
-		doJobThrad.setDaemon(true);
-		doJobThrad.start();
+		JobExecutor jobExecutor = new JobExecutor(out, inst, runnableFile,
+				inputFile, outputFile, errorFile, lock);
+		jobExecutor.start();
+
 		worker.setWorkload(worker.getWorkload() + 1);
 	}
 
-	public void doJob(AddJobInstruction inst, File runnableFile,
-			File inputFile, File outputFile, File errorFile) {
-		System.out.println("aaa");
-		String javaExePath = Paths
-				.get(System.getProperty("java.home"), "bin", "java")
-				.toAbsolutePath().toString();
-		int memoryLimit = inst.getMemoryLimit();
-		ProcessBuilder builder = null;
-		if (memoryLimit != -1) {
-			String memoryLimitArg = "-xmx" + memoryLimit + "m";
-			builder = new ProcessBuilder(javaExePath, "-jar",
-					runnableFile.getPath(), inputFile.getPath(),
-					outputFile.getPath(), memoryLimitArg);
-		} else {
-			builder = new ProcessBuilder(javaExePath, "-jar",
-					runnableFile.getPath(), inputFile.getPath(),
-					outputFile.getPath());
-		}
-		builder.redirectError(errorFile);
-		try {
-
-			Process p = builder.start();
-			int timeLimit = inst.getTimeLimit();
-			boolean finished = true;
-			if (timeLimit != -1) {
-				System.out.println("bbb2");
-				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
-			} else {
-				// This take like 1 minute or longer
-				// BEAWARE
-				System.out.println("bbb1");
-				p.waitFor();
-			}
-			System.out.println("bbb0");
-			lock.lock();
-			interrupt();
-			if (!finished || p.exitValue() != 0) {
-				Util.send(out, "Failed", inst.getJobId());
-				String reply = Util.receive(in).getMessage();
-				if (reply.equals("Ready To Receive Result")) {
-					Util.sendFile(out, errorFile);
-				}
-			} else {
-				Util.send(out, "Done", inst.getJobId());
-				String reply = Util.receive(in).getMessage();
-				if (reply.equals("Ready To Receive Result")) {
-					Util.sendFile(out, outputFile);
-				}
-			}
-			String reply = Util.receive(in).getMessage();
-			System.out.println("xxx");
-			if (reply.equals("File Received")) {
-				lock.unlock();
-				worker.setWorkload(worker.getWorkload() - 1);
-				System.out.println("zzz");
-			}
-			System.out.println("zzz11");
-		} catch (InterruptedException e) {
-			System.err.println("Job interrupted");
-			e.printStackTrace();
-		} catch (IOException e1) {
-			System.err.println("Connection down");
-			e1.printStackTrace();
-		}
-
-	}
 }

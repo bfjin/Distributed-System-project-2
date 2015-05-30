@@ -15,7 +15,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 public class Util {
 
-	public static int masterSocket = 4445;
+	//public static int masterSocket = 4445;
 	public static int workerSocket = 4444;
 
 	public static void sendFile(DataOutputStream out, File file) {
