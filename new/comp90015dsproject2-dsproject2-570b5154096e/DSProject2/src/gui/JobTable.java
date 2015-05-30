@@ -44,13 +44,16 @@ public class JobTable extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				try {
-					File f = jobs.get(Integer.parseInt(event.
-							getActionCommand())).getResultFile();
-					java.awt.Desktop.getDesktop().edit(f);
-				} catch (IOException e) {
-					System.err.println("Failed to open result file");
-					e.printStackTrace();
+				if (Integer.parseInt(event.getActionCommand()) < jobs.size()) {
+					try {
+						File f = jobs.get(
+								Integer.parseInt(event.getActionCommand()))
+								.getResultFile();
+						java.awt.Desktop.getDesktop().edit(f);
+					} catch (IOException e) {
+						System.err.println("Failed to open result file");
+						e.printStackTrace();
+					}
 				}
 			}
 		};
