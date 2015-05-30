@@ -32,6 +32,8 @@ public class Worker {
 	private WorkerTable workerTable;
 	private Thread receiveThread;
 	
+	private Job currentJob;
+	
 	public int getWorkerID() {
 		return workerID;
 	}
@@ -79,27 +81,13 @@ public class Worker {
 
 	public void sendJob(Job job) {		
 		lock.lock();
-		receiveThread.interrupt();
 		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
-		String reply = Util.receive(in).getMessage();
-		if (reply.equals("Ready To Receive Runnable File")){
-			Util.sendFile(out, job.getRunnableFile());
-		}
-		reply = Util.receive(in).getMessage();
-		if (reply.equals("Ready To Receive Input File")){
-			Util.sendFile(out, job.getInputFile());	
-		}
-		reply = Util.receive(in).getMessage();
-		if (reply.equals("File Received")){
-			job.setStatus(1);
-			lock.unlock();
-		}		
+		currentJob = job;	
 	}
 	
 	public int getWorkLoad() {		
 		lock.lock();
-		receiveThread.interrupt();
 		Util.send(out, "RequestWorkLoad");
 		String reply = Util.receive(in).getMessage();
 		lock.unlock();
@@ -121,8 +109,6 @@ public class Worker {
 
 	private void receiveData() {
 		while (true) {
-			while (lock.isLocked()) {
-			}
 			System.out.println("aaa");	
 			Instruction inst = Util.receive(in);
 			lock.lock();
@@ -161,6 +147,17 @@ public class Worker {
 					System.err.println("Failed to create result file");
 					e.printStackTrace();
 				}
+			}
+			else if (message.equals("Ready To Receive Runnable File")){
+				Util.sendFile(out, currentJob.getRunnableFile());
+			}
+			else if (message.equals("Ready To Receive Input File")){
+				Util.sendFile(out, currentJob.getRunnableFile());
+			}
+			else if (message.equals("File Received")){
+				currentJob.setStatus(1);
+				lock.unlock();
+				currentJob = null;
 			}
 			else {
 				System.out.println("Unexpected message:  " + message);
