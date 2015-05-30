@@ -21,8 +21,8 @@ public class Listener {
 		setWorkload(0);
 		try {
 
-			serverSocket = Util.getServerSocket("client.jks", serverPort);
-			serverSocket.setNeedClientAuth(true);  
+			serverSocket = Util.getServerSocket(serverPort);
+			//serverSocket.setNeedClientAuth(true);  
 			System.out.println("Worker Started");
 			while (true) {			
 				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();

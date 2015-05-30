@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +23,7 @@ class Connection extends Thread {
 
 	private DataInputStream sendIn;
 	private DataOutputStream sendOut;
-	private SSLSocket sendSocket;
+	private Socket sendSocket;
 
 	private ReentrantLock sendLock;
 	private ReentrantLock receiveLock;
@@ -42,9 +43,7 @@ class Connection extends Thread {
 					.getHostAddress();
 			
 			
-			SSLSocketFactory sslSocketFactory = 
-					(SSLSocketFactory) SSLSocketFactory.getDefault();
-			sendSocket = (SSLSocket) sslSocketFactory.createSocket(masterAddress, Util.masterSocket);
+			sendSocket = new Socket(masterAddress, Util.masterSocket);
 
 			
 			sendIn = new DataInputStream(sendSocket.getInputStream());

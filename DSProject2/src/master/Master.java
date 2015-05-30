@@ -5,6 +5,7 @@ import gui.WorkerTable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.net.ssl.SSLServerSocket;
@@ -25,7 +26,7 @@ public class Master {
 		jobs = new ArrayList<Job>();
 
 		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
-		workers.add(new Worker(this, "146.118.97.86", Util.workerSocket, workerTable));
+		workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
 		
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
@@ -45,7 +46,7 @@ public class Master {
 		Worker worker = selectWorker(workers);
 		System.err.println("workerid = " + worker.getWorkerID());
 		worker.sendJob(job);
-		jobTable.updateTable();
+		//jobTable.updateTable();
 	}
 
 	public void addWorker(String address, int port) {
@@ -87,12 +88,12 @@ public class Master {
 	}
 
 	public void listen(int serverPort) {
-		SSLServerSocket serverSocket;
+		ServerSocket serverSocket;
 		try {
-			serverSocket = Util.getServerSocket("server.jks", serverPort);
-			serverSocket.setNeedClientAuth(true);  
+			serverSocket = new ServerSocket (serverPort);
+			//serverSocket.setNeedClientAuth(true);  
 			while (true) {
-				SSLSocket workerSocket = (SSLSocket) serverSocket.accept();
+				Socket workerSocket = serverSocket.accept();
 				String address = workerSocket.getLocalAddress()
 						.getHostAddress();
 				for (Worker worker : workers) {
