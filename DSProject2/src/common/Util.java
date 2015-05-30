@@ -12,10 +12,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 public class Util {
 
@@ -23,7 +19,7 @@ public class Util {
 	public static int workerSocket = 4444;
 
 	public static void sendFile(DataOutputStream out, File file) {
-		System.out.println("Send File: " + file.getPath());
+		System.out.println("Sending File: " + file.getPath());
 		try {
 			byte [] bytearray  = new byte [8192];
 			FileInputStream fin = new FileInputStream(file);
@@ -43,7 +39,7 @@ public class Util {
 	}
 
 	public static File receiveFile(DataInputStream in, File file) {
-		System.out.println("Receive File: " + file.getPath());
+		System.out.println("Receiving File: " + file.getPath());
 
 		try {
 			byte[] bytearray = new byte[8192];
@@ -104,9 +100,10 @@ public class Util {
 
 	public static Instruction receive(DataInputStream in) {
 		try {
+			System.err.println(in);
 			String data = in.readUTF();
 			// TODO deal with receive file
-			if (data.length() < 1000) {
+			//if (data.length() < 1000) {
 				System.out.println("Receive: " + data);
 				String type = Instruction.getTypefromJson(data);
 				if (type.equals("Instruction")){
@@ -118,7 +115,7 @@ public class Util {
 				if (type.equals("AddJobInstruction")){
 					return AddJobInstruction.fromJson(data);
 				}
-			}
+			//}
 			return new Instruction("");
 		} catch (IOException e) {
 			System.err.println("Failed when receive instruction");

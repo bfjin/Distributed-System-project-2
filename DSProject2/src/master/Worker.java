@@ -10,9 +10,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-
 import common.Instruction;
 import common.JobInstruction;
 import common.Util;
@@ -24,21 +21,16 @@ public class Worker {
 	private int port;
 	private boolean running;
 
-	private Socket sendSocket;
-	private DataInputStream sendIn;
-	private DataOutputStream sendOut;
-
-	private Socket receiveSocket;
-	private DataInputStream receiveIn;
-	private DataOutputStream receiveOut;
+	private DataInputStream in;
+	private DataOutputStream out;
 	
-	private ReentrantLock sendLock;
-	private ReentrantLock receiveLock;
+	private ReentrantLock lock;
 
 	private static int id = 1;
 	private int workerID;
 	
-	WorkerTable workerTable;
+	private WorkerTable workerTable;
+	private Thread receiveThread;
 	
 	public int getWorkerID() {
 		return workerID;
@@ -49,21 +41,27 @@ public class Worker {
 		this.address = address;
 		this.port = port;
 		this.workerTable = workerTable;
-		sendLock = new ReentrantLock();
-		receiveLock = new ReentrantLock();
+		lock = new ReentrantLock();
 		connect();
 		workerID = id;
 		id ++;
+		
+		//receiveThread = new Thread(() -> receiveData());
+		//receiveThread.setDaemon(true);
+		//receiveThread.start();
 	}
 
 	public void connect() {
 		try {
 
-			SSLSocketFactory sslSocketFactory = 
-					(SSLSocketFactory) SSLSocketFactory.getDefault();
-			sendSocket = sslSocketFactory.createSocket(address, port);
-			sendIn = new DataInputStream(sendSocket.getInputStream());
-			sendOut = new DataOutputStream(sendSocket.getOutputStream());
+//			SSLSocketFactory sslSocketFactory = 
+//					(SSLSocketFactory) SSLSocketFactory.getDefault();
+//			Socket socket = sslSocketFactory.createSocket(address, port);
+			@SuppressWarnings("resource")
+			Socket socket = new Socket(address, port);
+
+			in = new DataInputStream(socket.getInputStream());
+			out = new DataOutputStream(socket.getOutputStream());
 			running = true;
 			if (workerTable != null) {
 				workerTable.updateTable();
@@ -80,28 +78,35 @@ public class Worker {
 		}
 	}
 
-	public void sendJob(Job job) {
-		sendLock.lock();
-		Util.send(sendOut, "AddJob", job.getId(), job.getTimeLimit(),
-				job.getMemoryLimit());
-		String reply = Util.receive(sendIn).getMessage();
+	public void sendJob(Job job) {		
+		//lock.lock();
+		//receiveThread.interrupt();
+		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
+				job.getMemoryLimit());	
+		
+		String reply = Util.receive(in).getMessage();
+		
 		if (reply.equals("Ready To Receive Runnable File")){
-			Util.sendFile(sendOut, job.getRunnableFile());
+			
+			Util.sendFile(out, job.getRunnableFile());
 		}
-		reply = Util.receive(sendIn).getMessage();
+		reply = Util.receive(in).getMessage();
 		if (reply.equals("Ready To Receive Input File")){
-			Util.sendFile(sendOut, job.getInputFile());	
+			Util.sendFile(out, job.getInputFile());	
 		}
-		reply = Util.receive(sendIn).getMessage();
+		reply = Util.receive(in).getMessage();
 		if (reply.equals("File Received")){
 			job.setStatus(1);
-			sendLock.unlock();
-		}		
+			lock.unlock();
+		}	
 	}
 	
-	public int getWorkLoad() {
-		Util.send(sendOut, "RequestWorkLoad");
-		String reply = Util.receive(sendIn).getMessage();
+	public int getWorkLoad() {		
+		lock.lock();
+		//receiveThread.interrupt();
+		Util.send(out, "RequestWorkLoad");
+		String reply = Util.receive(in).getMessage();
+		lock.unlock();
 		return Integer.parseInt(reply);
 	}
 
@@ -117,29 +122,17 @@ public class Worker {
 		return port;
 	}
 
-	public Socket getReceiveSocket() {
-		return receiveSocket;
-	}
-
-	public void setReceiveSocket(Socket receiveSocket) {
-		this.receiveSocket = receiveSocket;
-		try {
-			receiveIn = new DataInputStream(receiveSocket.getInputStream());
-			receiveOut = new DataOutputStream(receiveSocket.getOutputStream());
-		} catch (IOException e) {
-			System.err.println("Failed to create Data stream");
-			e.printStackTrace();
-		}
-		Thread receiveThread = new Thread(() -> receiveData());
-		receiveThread.setDaemon(true);
-		receiveThread.start();
-	}
 
 	private void receiveData() {
 		while (true) {
+			while (lock.isLocked()) {
+			}
+
+
+
 			System.out.println("aaa");	
-			Instruction inst = Util.receive(receiveIn);
-			receiveLock.lock();
+			Instruction inst = Util.receive(in);
+			lock.lock();
 			String message = inst.getMessage();
 			System.out.println("eee");	
 			if (message.equals("Done")) {
@@ -148,10 +141,10 @@ public class Worker {
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
 				File resultFile = job.getResultFile();
-				Util.send(receiveOut, "Ready To Receive Result");
-				Util.receiveFile(receiveIn, resultFile);
-				Util.send(receiveOut, "File Received");
-				receiveLock.unlock();
+				Util.send(out, "Ready To Receive Result");
+				Util.receiveFile(in, resultFile);
+				Util.send(out, "File Received");
+				lock.unlock();
 				System.out.println("ccc");	
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
@@ -164,10 +157,10 @@ public class Worker {
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
-				Util.send(receiveOut, "Ready To Receive Result");
-				Util.receiveFile(receiveIn, resultFile);
-				Util.send(receiveOut, "File Received");
-				receiveLock.unlock();
+				Util.send(out, "Ready To Receive Result");
+				Util.receiveFile(in, resultFile);
+				Util.send(out, "File Received");
+				lock.unlock();
 				System.out.println("ddd");	
 				try {
 					java.awt.Desktop.getDesktop().edit(resultFile);
@@ -175,6 +168,9 @@ public class Worker {
 					System.err.println("Failed to create result file");
 					e.printStackTrace();
 				}
+			}
+			else {
+				System.out.println("Unexpected message:  " + message);
 			}
 
 		}

@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -12,7 +14,7 @@ import master.Master;
 
 public class Main {
 
-	private JFrame frame;
+	private JFrame frmMasterGui;
 	private Master master;
 	/**
 	 * Launch the application.
@@ -22,7 +24,7 @@ public class Main {
 			public void run() {
 				try {
 					Main window = new Main();
-					window.frame.setVisible(true);
+					window.frmMasterGui.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -43,35 +45,47 @@ public class Main {
 	private void initialize() {
 		master = new Master();
 
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmMasterGui = new JFrame();
+		frmMasterGui.setTitle("Master GUI");
+		frmMasterGui.setBounds(100, 100, 400, 200);
+		frmMasterGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JButton btnAddAJob = new JButton("Add a Job");
+		btnAddAJob.setPreferredSize(new Dimension(150, 25));
+		btnAddAJob.setMinimumSize(new Dimension(150, 25));
+		btnAddAJob.setMaximumSize(new Dimension(150, 25));
+		btnAddAJob.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnAddAJob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AddJobDialog dialog = new AddJobDialog(master);
 				dialog.pack();
-				dialog.setLocationRelativeTo(frame);
+				dialog.setLocationRelativeTo(frmMasterGui);
 				dialog.setVisible(true);
 			}
 		});
-		frame.getContentPane().setLayout(
-				new FlowLayout(FlowLayout.CENTER, 5, 5));
-		frame.getContentPane().add(btnAddAJob);
+		frmMasterGui.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 20, 30));
+		frmMasterGui.getContentPane().add(btnAddAJob);
 
-		JButton button = new JButton("Add a Worker");
-		button.addActionListener(new ActionListener() {
+		JButton btnAddWorker = new JButton("Add a Worker");
+		btnAddWorker.setPreferredSize(new Dimension(150, 25));
+		btnAddWorker.setMinimumSize(new Dimension(150, 25));
+		btnAddWorker.setMaximumSize(new Dimension(150, 25));
+		btnAddWorker.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnAddWorker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				AddWorkerDialog dialog = new AddWorkerDialog(master);
 				dialog.pack();
-				dialog.setLocationRelativeTo(frame);
+				dialog.setLocationRelativeTo(frmMasterGui);
 				dialog.setVisible(true);
 			}
 		});
-		frame.getContentPane().add(button);
+		frmMasterGui.getContentPane().add(btnAddWorker);
 
 		JButton btnShowJobsTable = new JButton("Show Job Statuses");
+		btnShowJobsTable.setPreferredSize(new Dimension(150, 25));
+		btnShowJobsTable.setMinimumSize(new Dimension(150, 25));
+		btnShowJobsTable.setMaximumSize(new Dimension(150, 25));
+		btnShowJobsTable.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnShowJobsTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JobTable jobs = new JobTable(master);
@@ -79,9 +93,13 @@ public class Main {
 				master.setJobTable(jobs);
 			}
 		});
-		frame.getContentPane().add(btnShowJobsTable);
+		frmMasterGui.getContentPane().add(btnShowJobsTable);
 
 		JButton btnShowWorkersTable = new JButton("Show Worker Statuses");
+		btnShowWorkersTable.setPreferredSize(new Dimension(150, 25));
+		btnShowWorkersTable.setMinimumSize(new Dimension(150, 25));
+		btnShowWorkersTable.setMaximumSize(new Dimension(150, 25));
+		btnShowWorkersTable.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnShowWorkersTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				WorkerTable workers = new WorkerTable(master);
@@ -89,6 +107,6 @@ public class Main {
 				master.setWorkerTable(workers);
 			}
 		});
-		frame.getContentPane().add(btnShowWorkersTable);
+		frmMasterGui.getContentPane().add(btnShowWorkersTable);
 	}
 }

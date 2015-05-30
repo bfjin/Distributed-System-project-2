@@ -3,14 +3,7 @@ package master;
 import gui.JobTable;
 import gui.WorkerTable;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
-
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
 
 import common.Util;
 
@@ -27,10 +20,13 @@ public class Master {
 
 		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
 		//workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
-		
+
+		/*
 		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
 		listenThread.setDaemon(true);
 		listenThread.start();
+		*/
+
 	}
 	
 	public void setJobTable(JobTable jobTable) {
@@ -52,22 +48,23 @@ public class Master {
 	public void addWorker(String address, int port) {
 		Worker worker = new Worker(this, address, port, workerTable);
 		workers.add(worker);
-		//workerTable.updateTable();
+		workerTable.updateTable();
 	}
 
 	// something wrong here
 	private Worker selectWorker(ArrayList<Worker> workers) {
-		int min = -1;
-		Worker selected = null;
-		for (Worker worker : workers) {
-			System.err.println(worker.getWorkLoad());
-			int workload = worker.getWorkLoad();
-			if (workload > min) {
-				min = workload;
-				selected = worker;
-			}
-		}
-		return selected;
+//		int min = -1;
+//		Worker selected = null;
+//		for (Worker worker : workers) {
+//			System.err.println(worker.getWorkLoad());
+//			int workload = worker.getWorkLoad();
+//			if (workload > min) {
+//				min = workload;
+//				selected = worker;
+//			}
+//		}
+//		return selected;
+		return workers.get(0);
 	}
 
 	public Job findJobById(String jobId) {
@@ -86,7 +83,7 @@ public class Master {
 	public ArrayList<Worker> getWorkers() {
 		return workers;
 	}
-
+/*
 	public void listen(int serverPort) {
 		ServerSocket serverSocket;
 		try {
@@ -109,4 +106,6 @@ public class Master {
 			e.printStackTrace();
 		}
 	}
+*/
+
 }
