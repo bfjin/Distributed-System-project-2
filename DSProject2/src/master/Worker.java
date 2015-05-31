@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -27,14 +26,20 @@ public class Worker {
 	private DataInputStream in;
 	private DataOutputStream out;
 
-	private Job currentJob;
-	private WorkerTable workerTable;
-	private int workload;
-	private boolean resultReceived;
-
 	private ReentrantLock lock;
-	private Condition receiveFile;
-	private Condition requestWorkload;
+
+	private static int id = 1;
+	private int workerID;
+
+	private WorkerTable workerTable;
+
+	private Job currentJob;
+	
+	private int workload;
+
+	public int getWorkerID() {
+		return workerID;
+	}
 
 	public Worker(Master master, String address, int port,
 			WorkerTable workerTable) {
@@ -43,10 +48,10 @@ public class Worker {
 		this.port = port;
 		this.workerTable = workerTable;
 		lock = new ReentrantLock();
-		receiveFile = lock.newCondition();
-		requestWorkload = lock.newCondition();
-
 		connect();
+		workerID = id;
+		id++;
+
 		Thread receiveThread = new Thread(() -> receiveData());
 		receiveThread.setDaemon(true);
 		receiveThread.start();
@@ -84,25 +89,16 @@ public class Worker {
 
 	/**
 	 * Send a job to a worker
-	 * 
-	 * @param job
-	 *            job to be send
+	 * @param job job to be send
 	 */
 	public void sendJob(Job job) {
 		lock.lock();
-		try {
-			resultReceived = false;
-			Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
-					job.getMemoryLimit());
-			job.setStatus(1);
-			currentJob = job;
-			while (!resultReceived) {
-				receiveFile.awaitUninterruptibly();
-			}
-		} finally {
-			lock.unlock();
-		}
+		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
+				job.getMemoryLimit());
+		job.setStatus(1);
+		currentJob = job;
 	}
+
 
 	private void receiveData() {
 		while (true) {
@@ -137,49 +133,44 @@ public class Worker {
 			} else if (message.equals("Ready To Receive Input File")) {
 				Util.sendFile(out, currentJob.getInputFile());
 			} else if (message.equals("File Received")) {
-				resultReceived = true;
-				receiveFile.signal();
+				lock = new ReentrantLock();
 				currentJob = null;
 			} else if (message.startsWith("Current Workload: ")) {
 				workload = Integer.parseInt(message.substring(18));
-				requestWorkload.signal();
+				lock = new ReentrantLock();
 			} else {
 				System.err.println("Unexpected message:  " + message);
 			}
 		}
 	}
-
+	
 	/**
 	 * @return the workload of the worker
 	 */
 	public int getWorkLoad() {
 		lock.lock();
-		try {
-			workload = -1;
-			Util.send(out, "RequestWorkLoad");
-			while (workload == -1) {
-				requestWorkload.awaitUninterruptibly();
-			}
-		} finally {
-			lock.unlock();
+		Util.send(out, "RequestWorkLoad");
+		while (lock.isLocked()) {
+
+			//Wait until lock is unlocked
 		}
 		return workload;
 	}
-
+	
 	/**
 	 * @return the status of the worker
 	 */
 	public boolean isRunning() {
 		return running;
 	}
-
+	
 	/**
 	 * @return the worker address
 	 */
 	public String getAddress() {
 		return address;
 	}
-
+	
 	/**
 	 * @return the port
 	 */

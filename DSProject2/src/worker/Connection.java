@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import common.AddJobInstruction;
@@ -16,7 +15,6 @@ import common.Util;
 
 class Connection extends Thread {
 	public static ReentrantLock lock;
-	public static Condition fileReceive;
 	private DataInputStream in;
 	private DataOutputStream out;	
 	private Listener worker;
@@ -27,7 +25,6 @@ class Connection extends Thread {
 		this.worker = worker;
 		jobExecutors = new ArrayList<JobExecutor>();
 		lock = new ReentrantLock();
-		fileReceive = lock.newCondition();
 		try {
 			in = new DataInputStream(clientSocket.getInputStream());
 			out = new DataOutputStream(clientSocket.getOutputStream());
@@ -54,7 +51,8 @@ class Connection extends Thread {
 				JobExecutor jobExecutor = findJobExcutorById(jobId);
 				jobExecutor.sendOutputFile();
 			} else if (message.equals("File Received")) {
-				fileReceive.signal();
+				lock = new ReentrantLock();
+				worker.setWorkload(worker.getWorkload() - 1);
 			} else {
 				System.out.println("Unexpected message:  " + message);
 			}

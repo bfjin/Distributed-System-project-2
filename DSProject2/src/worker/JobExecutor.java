@@ -12,7 +12,7 @@ import common.Util;
 
 public class JobExecutor extends Thread {
 
-	private String jobId;
+	private String jobId;	
 	private DataOutputStream out;
 	private AddJobInstruction instruction;
 	private File runnableFile;
@@ -21,9 +21,8 @@ public class JobExecutor extends Thread {
 	private File errorFile;
 	private boolean error;
 
-	public JobExecutor(DataOutputStream out, AddJobInstruction inst,
-			File runnableFile, File inputFile, File outputFile, File errorFile,
-			ReentrantLock lock) {
+	public JobExecutor(DataOutputStream out, AddJobInstruction inst, File runnableFile,
+			File inputFile, File outputFile, File errorFile, ReentrantLock lock) {
 		this.out = out;
 		this.instruction = inst;
 		this.runnableFile = runnableFile;
@@ -59,21 +58,19 @@ public class JobExecutor extends Thread {
 			if (timeLimit != -1) {
 				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
 			} else {
+				// This take like 1 minute or longer
+				// BEAWARE
 				p.waitFor();
 			}
 			Connection.lock.lock();
-			try {
-				if (!finished || p.exitValue() != 0) {
-					Util.send(out, "Failed", instruction.getJobId());
-					error = true;
-				} else {
-					Util.send(out, "Done", instruction.getJobId());
-					error = false;
-				}
-				Connection.fileReceive.awaitUninterruptibly();
-			} finally {
-				Connection.lock.unlock();
-			}		
+			interrupt();
+			if (!finished || p.exitValue() != 0) {
+				Util.send(out, "Failed", instruction.getJobId());
+				error = true;
+			} else {
+				Util.send(out, "Done", instruction.getJobId());
+				error = false;
+			}
 		} catch (InterruptedException e) {
 			System.err.println("Job interrupted");
 			e.printStackTrace();
@@ -82,14 +79,15 @@ public class JobExecutor extends Thread {
 			e1.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Send output file back to the master.
 	 */
-	public void sendOutputFile() {
-		if (error) {
+	public void sendOutputFile(){
+		if (error){
 			Util.sendFile(out, errorFile);
-		} else {
+		}
+		else {
 			Util.sendFile(out, outputFile);
 		}
 	}
