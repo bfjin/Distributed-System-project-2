@@ -31,8 +31,8 @@ public class Master {
 		//		getWorkerTable()));
 		 //workers.add(new Worker(this, "146.118.97.86", Util.workerSocket,
 		 //workerTable));
-		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
-		 workerTable));
+//		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
+//		 workerTable));
 		 
 
 		 workers.add(new Worker(this, "43.240.96.206", Util.workerSocket,
