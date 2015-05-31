@@ -14,9 +14,9 @@ import common.JobInstruction;
 import common.Util;
 
 class Connection extends Thread {
+	public static ReentrantLock lock;
 	private DataInputStream in;
-	private DataOutputStream out;
-	private ReentrantLock lock;
+	private DataOutputStream out;	
 	private Listener worker;
 	private ArrayList<JobExecutor> jobExecutors;
 

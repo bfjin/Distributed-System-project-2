@@ -20,7 +20,6 @@ public class JobExecutor extends Thread {
 	private File outputFile;
 	private File errorFile;
 	private boolean error;
-	private ReentrantLock lock;
 
 	public JobExecutor(DataOutputStream out, AddJobInstruction inst, File runnableFile,
 			File inputFile, File outputFile, File errorFile, ReentrantLock lock) {
@@ -31,7 +30,6 @@ public class JobExecutor extends Thread {
 		this.outputFile = outputFile;
 		this.errorFile = errorFile;
 		this.jobId = instruction.getJobId();
-		this.lock = lock;
 	}
 
 	@Override
@@ -65,7 +63,7 @@ public class JobExecutor extends Thread {
 				p.waitFor();
 			}
 			System.err.println("Job Executor locked");
-			lock.lock();
+			Connection.lock.lock();
 			interrupt();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(out, "Failed", instruction.getJobId());
@@ -74,7 +72,6 @@ public class JobExecutor extends Thread {
 				Util.send(out, "Done", instruction.getJobId());
 				error = false;
 			}
-			System.out.println("message = " + "aaa");		
 		} catch (InterruptedException e) {
 			System.err.println("Job interrupted");
 			e.printStackTrace();

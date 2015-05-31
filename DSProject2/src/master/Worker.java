@@ -130,6 +130,8 @@ public class Worker {
 				Util.send(out, "File Received", job.getId());
 				System.err.println("Worker locked");
 				lock.unlock();
+				if (master.getJobTable() != null)
+					master.getJobTable().updateTable();
 			} else if (message.equals("Failed")) {
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
@@ -143,15 +145,16 @@ public class Worker {
 				System.err.println("Unlocked");
 				lock.unlock();
 				System.err.println("Worker Unlocked");
+				if (master.getJobTable() != null)
+					master.getJobTable().updateTable();
 			} else if (message.equals("Ready To Receive Runnable File")) {
 				Util.sendFile(out, currentJob.getRunnableFile());
 			} else if (message.equals("Ready To Receive Input File")) {
-				Util.sendFile(out, currentJob.getRunnableFile());
+				Util.sendFile(out, currentJob.getInputFile());
 			} else if (message.equals("File Received")) {
 				currentJob.setStatus(1);
-				System.err.println(lock.isLocked());
 				lock = new ReentrantLock();
-				System.err.println(lock.isLocked());
+				System.err.println("Worker forced unlocked");
 				currentJob = null;
 			} else if (message.startsWith("Current Workload: ")) {
 				workload = Integer.parseInt(message.substring(18));
