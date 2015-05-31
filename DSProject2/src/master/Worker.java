@@ -76,8 +76,6 @@ public class Worker {
 			SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory
 					.getDefault();
 			Socket socket = sslSocketFactory.createSocket(address, port);
-			// @SuppressWarnings("resource")
-			// Socket socket = new Socket(address, port);
 
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
