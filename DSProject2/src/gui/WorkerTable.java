@@ -16,7 +16,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import master.Master;
-import master.Worker;
+import master.WorkerConnection;
 
 /**
  * Table listing all workers. 
@@ -26,7 +26,7 @@ import master.Worker;
 public class WorkerTable extends JPanel {
 
 	private static final long serialVersionUID = 3524291560512364688L;
-	ArrayList<Worker> workers;
+	ArrayList<WorkerConnection> workerConnections;
 	String[] tableColumnNames = {"Address", "Port", "Running?"};
 	Object[][] tableData = new Object[50][3];
 	JTable table;
@@ -36,7 +36,7 @@ public class WorkerTable extends JPanel {
 	 * @param master Contains data about workers. 
 	 */
 	public WorkerTable(Master master) {
-		workers = master.getWorkers();
+		workerConnections = master.getWorkers();
 		
 		tableData[0] = new Object[]{"No workers", "N/A", "N/A"};
 		table = new JTable(new WorkerTableModel());
@@ -93,7 +93,7 @@ public class WorkerTable extends JPanel {
 	// Update the table data and redraw the table.
 	public void updateTable() {
 		int count = 0;
-		for (Worker w : workers) {
+		for (WorkerConnection w : workerConnections) {
 			String tableRunning = "";
 			if (w.isRunning() == true) {
 				tableRunning = "Yes";

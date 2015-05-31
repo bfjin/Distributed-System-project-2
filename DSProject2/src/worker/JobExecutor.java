@@ -79,7 +79,7 @@ public class JobExecutor extends Thread {
 			} else {
 				p.waitFor();
 			}
-			Connection.lock.lock();
+			MasterConnection.lock.lock();
 			interrupt();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(out, "Failed", instruction.getJobId());

@@ -60,7 +60,6 @@ public class AddJobInstruction extends JobInstruction {
 							.get("TimeLimit")), Integer.parseInt((String) obj
 							.get("MemoryLimit")));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}

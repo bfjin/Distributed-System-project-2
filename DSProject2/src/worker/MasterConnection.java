@@ -23,14 +23,14 @@ import common.Util;
  * Connection class takes responsibility to make connection with the master
  * and delegate work to the JobExecutor, and communicates with the master
  * */
-class Connection extends Thread {
+class MasterConnection extends Thread {
 	public static ReentrantLock lock;
 	private DataInputStream in;
 	private DataOutputStream out;	
-	private Listener worker;
+	private Worker worker;
 	private ArrayList<JobExecutor> jobExecutors;
 
-	public Connection(Socket clientSocket, Listener worker) {
+	public MasterConnection(Socket clientSocket, Worker worker) {
 		setDaemon(true);
 		this.worker = worker;
 		jobExecutors = new ArrayList<JobExecutor>();
@@ -114,7 +114,7 @@ class Connection extends Thread {
 			Util.send(out, "File Received");
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("File Receive Failed");
 			e.printStackTrace();
 		}
 		lock.unlock();

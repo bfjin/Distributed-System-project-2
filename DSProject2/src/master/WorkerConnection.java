@@ -26,7 +26,7 @@ import common.Util;
  * Worker class is a representation under the master that does the
  * connection and communication with the actual worker on the cloud
  * */
-public class Worker {
+public class WorkerConnection {
 
 	private Master master;
 	private String address;
@@ -51,7 +51,7 @@ public class Worker {
 		return workerID;
 	}
 
-	public Worker(Master master, String address, int port,
+	public WorkerConnection(Master master, String address, int port,
 			WorkerTable workerTable) {
 		this.master = master;
 		this.address = address;
@@ -107,7 +107,7 @@ public class Worker {
 			Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 					job.getMemoryLimit());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Add job sending failed.");
 			e.printStackTrace();
 		}
 		job.setStatus(1);
@@ -133,7 +133,7 @@ public class Worker {
 					Util.receiveFile(in, resultFile);
 					Util.send(out, "File Received", job.getId());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					System.err.println("File Receive Failed.");
 					e.printStackTrace();
 				}		
 				lock.unlock();
@@ -145,16 +145,14 @@ public class Worker {
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
 				lock.lock();
-
 				try {
 					Util.send(out, "Ready To Receive Result", job.getId());
 					Util.receiveFile(in, resultFile);
 					Util.send(out, "File Received", job.getId());
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					System.err.println("File Receive Failed.");
 					e.printStackTrace();
 				}
-
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
@@ -189,15 +187,12 @@ public class Worker {
 	 */
 	public int getWorkLoad() {
 		lock.lock();
-
-
 		try {
 			Util.send(out, "RequestWorkLoad");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return Integer.MAX_VALUE;			
 		}
-
 		return workload;
 	}
 
