@@ -20,13 +20,6 @@ public class Master {
 
 		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket, workerTable));
 		//workers.add(new Worker(this, "146.118.97.88", Util.workerSocket, workerTable));
-
-		/*
-		Thread listenThread = new Thread(() -> listen(Util.masterSocket));
-		listenThread.setDaemon(true);
-		listenThread.start();
-		*/
-
 	}
 	
 	public void setJobTable(JobTable jobTable) {
@@ -52,20 +45,17 @@ public class Master {
 		workerTable.updateTable();
 	}
 
-	// something wrong here
 	private Worker selectWorker(ArrayList<Worker> workers) {
-//		int min = -1;
-//		Worker selected = null;
-//		for (Worker worker : workers) {
-//			System.err.println(worker.getWorkLoad());
-//			int workload = worker.getWorkLoad();
-//			if (workload > min) {
-//				min = workload;
-//				selected = worker;
-//			}
-//		}
-//		return selected;
-		return workers.get(0);
+		int min = Integer.MAX_VALUE;
+		Worker selected = null;
+		for (Worker worker : workers) {			
+			int workload = worker.getWorkLoad();
+			if (workload < min) {
+				min = workload;
+				selected = worker;
+			}
+		}
+		return selected;
 	}
 
 	public Job findJobById(String jobId) {
@@ -84,29 +74,5 @@ public class Master {
 	public ArrayList<Worker> getWorkers() {
 		return workers;
 	}
-/*
-	public void listen(int serverPort) {
-		ServerSocket serverSocket;
-		try {
-			serverSocket = new ServerSocket (serverPort);
-			//serverSocket = Util.getServerSocket(serverPort);
-			//serverSocket.setNeedClientAuth(true);  
-			while (true) {
-				//SSLSocket workerSocket = (SSLSocket) serverSocket.accept();
-				Socket workerSocket = serverSocket.accept();
-				String address = workerSocket.getLocalAddress()
-						.getHostAddress();
-				for (Worker worker : workers) {
-					if (worker.getAddress().equals(address)){
-						worker.setReceiveSocket(workerSocket);
-					}
-				}
-			}
-		} catch (IOException e) {
-			System.err.println("Failed to establish connection with worker");
-			e.printStackTrace();
-		}
-	}
-*/
 
 }

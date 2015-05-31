@@ -25,23 +25,24 @@ public class Worker {
 
 	private DataInputStream in;
 	private DataOutputStream out;
-	
+
 	private ReentrantLock lock;
-	
 
 	private static int id = 1;
 	private int workerID;
-	
+
 	private WorkerTable workerTable;
-	private Thread receiveThread;
-	
+
 	private Job currentJob;
 	
+	private int workload;
+
 	public int getWorkerID() {
 		return workerID;
 	}
 
-	public Worker(Master master, String address, int port, WorkerTable workerTable) {
+	public Worker(Master master, String address, int port,
+			WorkerTable workerTable) {
 		this.master = master;
 		this.address = address;
 		this.port = port;
@@ -49,9 +50,9 @@ public class Worker {
 		lock = new ReentrantLock();
 		connect();
 		workerID = id;
-		id ++;
-		
-		receiveThread = new Thread(() -> receiveData());
+		id++;
+
+		Thread receiveThread = new Thread(() -> receiveData());
 		receiveThread.setDaemon(true);
 		receiveThread.start();
 	}
@@ -59,11 +60,11 @@ public class Worker {
 	public void connect() {
 		try {
 
-			SSLSocketFactory sslSocketFactory = 
-					(SSLSocketFactory) SSLSocketFactory.getDefault();
+			SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory
+					.getDefault();
 			Socket socket = sslSocketFactory.createSocket(address, port);
-//			@SuppressWarnings("resource")
-//			Socket socket = new Socket(address, port);
+			// @SuppressWarnings("resource")
+			// Socket socket = new Socket(address, port);
 
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
@@ -83,20 +84,21 @@ public class Worker {
 		}
 	}
 
-	public void sendJob(Job job) {		
-		System.err.println("Worker locked: " + lock.isLocked());
-		lock.lock();	
+	public void sendJob(Job job) {
+		System.err.println("Worker locked");
+		lock.lock();
 		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
 		currentJob = job;
 	}
-	
-	public int getWorkLoad() {		
+
+	public int getWorkLoad() {
 		lock.lock();
 		Util.send(out, "RequestWorkLoad");
-		String reply = Util.receive(in).getMessage();
-		lock.unlock();
-		return Integer.parseInt(reply);
+		while (lock.isLocked()) {
+			//Wait until lock is unlocked
+		}
+		return workload;
 	}
 
 	public boolean isRunning() {
@@ -111,13 +113,12 @@ public class Worker {
 		return port;
 	}
 
-
 	private void receiveData() {
 		while (true) {
 			System.err.println("Master standby");
-			Instruction inst = Util.receive(in);	
+			Instruction inst = Util.receive(in);
 			String message = inst.getMessage();
-			if (message.equals("Done")) {			
+			if (message.equals("Done")) {
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
@@ -129,7 +130,7 @@ public class Worker {
 				Util.send(out, "File Received", job.getId());
 				System.err.println("Worker locked");
 				lock.unlock();
-			} else if (message.equals("Failed")) {				
+			} else if (message.equals("Failed")) {
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(3);
@@ -142,21 +143,20 @@ public class Worker {
 				System.err.println("Unlocked");
 				lock.unlock();
 				System.err.println("Worker Unlocked");
-			}
-			else if (message.equals("Ready To Receive Runnable File")){
+			} else if (message.equals("Ready To Receive Runnable File")) {
 				Util.sendFile(out, currentJob.getRunnableFile());
-			}
-			else if (message.equals("Ready To Receive Input File")){
+			} else if (message.equals("Ready To Receive Input File")) {
 				Util.sendFile(out, currentJob.getRunnableFile());
-			}
-			else if (message.equals("File Received")){
+			} else if (message.equals("File Received")) {
 				currentJob.setStatus(1);
-				System.err.println(lock.isLocked());				
-				lock =  new ReentrantLock();
+				System.err.println(lock.isLocked());
+				lock = new ReentrantLock();
 				System.err.println(lock.isLocked());
 				currentJob = null;
-			}
-			else {
+			} else if (message.startsWith("Current Workload: ")) {
+				workload = Integer.parseInt(message.substring(18));
+				lock = new ReentrantLock();
+			} else {
 				System.err.println("Unexpected message:  " + message);
 			}
 

@@ -44,16 +44,16 @@ class Connection extends Thread {
 				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
 				addJob(addJobInstruction);
 			} else if (message.equals("RequestWorkLoad")) {
-				Util.send(out, worker.getWorkload() + "");
+				Util.send(out, "Current Workload: " + worker.getWorkload());
 			} else if (message.equals("Ready To Receive Result")) {
 				JobInstruction jobInstruction = (JobInstruction) inst;
 				String jobId = jobInstruction.getJobId();
 				System.err.println(jobId);
 				JobExecutor jobExecutor = findJobExcutorById(jobId);
 				jobExecutor.sendFile();
-				System.err.println("ok");
 			} else if (message.equals("File Received")) {
 				lock = new ReentrantLock();
+				worker.setWorkload(worker.getWorkload() - 1);
 			} else {
 				System.out.println("Unexpected message:  " + message);
 			}
