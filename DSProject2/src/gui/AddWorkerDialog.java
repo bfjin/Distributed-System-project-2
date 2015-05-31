@@ -92,12 +92,12 @@ public class AddWorkerDialog extends JDialog {
 									"Port is required and must be a number.",
 									"Error", JOptionPane.ERROR_MESSAGE);
 						}
-						if (address.equals("")){
+						if (address.trim().isEmpty()){
 							JOptionPane.showMessageDialog(AddWorkerDialog.this,
 									"Address is required.", "Error",
 									JOptionPane.ERROR_MESSAGE);
 						}
-						else if (port < 0){
+						else if (port < 0 && port > 65535){
 							JOptionPane.showMessageDialog(AddWorkerDialog.this,
 									"Port must between 0 and 65535.", "Error",
 									JOptionPane.ERROR_MESSAGE);
