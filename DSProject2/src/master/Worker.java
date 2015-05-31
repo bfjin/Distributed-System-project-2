@@ -106,12 +106,20 @@ public class Worker {
 	 */
 	public void sendJob(Job job) {
 		lock.lock();
-		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
-				job.getMemoryLimit());
+		try {
+			Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
+					job.getMemoryLimit());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		job.setStatus(1);
 		currentJob = job;
 	}
 
+	/**
+	 * Communicate with the cloud workers
+	 */
 	private void receiveData() {
 		while (true) {
 			Instruction inst = Util.receive(in);
@@ -122,9 +130,15 @@ public class Worker {
 				job.setStatus(2);
 				File resultFile = job.getResultFile();
 				lock.lock();
-				Util.send(out, "Ready To Receive Result", job.getId());
-				Util.receiveFile(in, resultFile);
-				Util.send(out, "File Received", job.getId());
+				
+				try {
+					Util.send(out, "Ready To Receive Result", job.getId());
+					Util.receiveFile(in, resultFile);
+					Util.send(out, "File Received", job.getId());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}		
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
@@ -134,16 +148,33 @@ public class Worker {
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
 				lock.lock();
-				Util.send(out, "Ready To Receive Result", job.getId());
-				Util.receiveFile(in, resultFile);
-				Util.send(out, "File Received", job.getId());
+
+				try {
+					Util.send(out, "Ready To Receive Result", job.getId());
+					Util.receiveFile(in, resultFile);
+					Util.send(out, "File Received", job.getId());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
 			} else if (message.equals("Ready To Receive Runnable File")) {
-				Util.sendFile(out, currentJob.getRunnableFile());
+				try {
+					Util.sendFile(out, currentJob.getRunnableFile());
+				} catch (IOException e) {
+					System.err.println("Failed when sending file");
+					e.printStackTrace();
+				}
 			} else if (message.equals("Ready To Receive Input File")) {
-				Util.sendFile(out, currentJob.getInputFile());
+				try {
+					Util.sendFile(out, currentJob.getInputFile());
+				} catch (IOException e) {
+					System.err.println("Failed when sending file");
+					e.printStackTrace();
+				}
 			} else if (message.equals("File Received")) {
 				lock = new ReentrantLock();
 				currentJob = null;
@@ -162,7 +193,12 @@ public class Worker {
 	public int getWorkLoad() {
 		lock.lock();
 		workload = -1;
-		Util.send(out, "RequestWorkLoad");
+		try {
+			Util.send(out, "RequestWorkLoad");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		while (workload == -1) {
 		}
 		return workload;
