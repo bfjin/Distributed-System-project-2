@@ -21,6 +21,7 @@ import javax.swing.table.TableColumnModel;
 
 /**
  * Class for the fourth column of the jobs table, which contains buttons.
+ * These buttons allow viewing of the result file of completed jobs. 
  * Based on an example at 
  * https://tips4java.wordpress.com/2009/07/12/table-button-column/
  */

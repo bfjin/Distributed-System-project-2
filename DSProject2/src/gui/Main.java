@@ -12,6 +12,10 @@ import javax.swing.JFrame;
 
 import master.Master;
 
+/**
+ * Main class for the GUI. Contains buttons for adding jobs, 
+ * adding workers, and viewing the jobs and workers tables. 
+ */
 public class Main {
 
 	private JFrame frmMasterGui;
@@ -50,6 +54,7 @@ public class Main {
 		frmMasterGui.setBounds(100, 100, 500, 200);
 		frmMasterGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		// Button for adding a job.
 		JButton btnAddAJob = new JButton("Add a Job");
 		btnAddAJob.setPreferredSize(new Dimension(180, 25));
 		btnAddAJob.setMinimumSize(new Dimension(180, 25));
@@ -57,15 +62,18 @@ public class Main {
 		btnAddAJob.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnAddAJob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Open the dialog when button is clicked.
 				AddJobDialog dialog = new AddJobDialog(master);
 				dialog.pack();
 				dialog.setLocationRelativeTo(frmMasterGui);
 				dialog.setVisible(true);
 			}
 		});
-		frmMasterGui.getContentPane().setLayout(new FlowLayout(FlowLayout.CENTER, 20, 30));
+		frmMasterGui.getContentPane().setLayout(new FlowLayout
+				(FlowLayout.CENTER, 20, 30));
 		frmMasterGui.getContentPane().add(btnAddAJob);
 
+		// Button for adding a worker. 
 		JButton btnAddWorker = new JButton("Add a Worker");
 		btnAddWorker.setPreferredSize(new Dimension(180, 25));
 		btnAddWorker.setMinimumSize(new Dimension(180, 25));
@@ -73,6 +81,7 @@ public class Main {
 		btnAddWorker.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnAddWorker.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Open the dialog when button is clicked.
 				AddWorkerDialog dialog = new AddWorkerDialog(master);
 				dialog.pack();
 				dialog.setLocationRelativeTo(frmMasterGui);
@@ -81,6 +90,7 @@ public class Main {
 		});
 		frmMasterGui.getContentPane().add(btnAddWorker);
 
+		// Button for showing the job table.
 		JButton btnShowJobsTable = new JButton("Show Job Statuses");
 		btnShowJobsTable.setPreferredSize(new Dimension(180, 25));
 		btnShowJobsTable.setMinimumSize(new Dimension(180, 25));
@@ -88,6 +98,7 @@ public class Main {
 		btnShowJobsTable.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnShowJobsTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Create the job table and update it. 
 				JobTable jobs = new JobTable(master);
 				jobs.updateTable();
 				master.setJobTable(jobs);
@@ -95,6 +106,7 @@ public class Main {
 		});
 		frmMasterGui.getContentPane().add(btnShowJobsTable);
 
+		// Button for showing the worker table.
 		JButton btnShowWorkersTable = new JButton("Show Worker Statuses");
 		btnShowWorkersTable.setPreferredSize(new Dimension(180, 25));
 		btnShowWorkersTable.setMinimumSize(new Dimension(180, 25));
@@ -102,6 +114,7 @@ public class Main {
 		btnShowWorkersTable.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnShowWorkersTable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Create the worker table and update it. 
 				WorkerTable workers = new WorkerTable(master);
 				workers.updateTable();
 				master.setWorkerTable(workers);
