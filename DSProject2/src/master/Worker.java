@@ -161,9 +161,8 @@ public class Worker {
 	 */
 	public int getWorkLoad() {
 		lock.lock();
-		workload = -1;
 		Util.send(out, "RequestWorkLoad");
-		while (workload == -1) {
+		while (lock.isLocked()) {
 		}
 		return workload;
 	}
