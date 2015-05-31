@@ -21,6 +21,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import master.Job;
 import master.Master;
 
+/**
+ * Class for the job dialog window which allows for the specification
+ * of details for a new job. 
+ */
 public class AddJobDialog extends JDialog {
 
 	private static final long serialVersionUID = -1382469568373074545L;
@@ -36,7 +40,6 @@ public class AddJobDialog extends JDialog {
 
 	/**
 	 * Create the dialog.
-	 * 
 	 * @param master
 	 */
 	public AddJobDialog(Master master) {
@@ -51,11 +54,13 @@ public class AddJobDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// New label for the dialog.
 				JLabel lblName = new JLabel("Job Name: ");
 				lblName.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblName);
 			}
 			{
+				// Set the default text. 
 				txtName = new JTextField();
 				txtName.setColumns(30);
 				panel.add(txtName);
@@ -67,17 +72,20 @@ public class AddJobDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// New field for runnable file.
 				JLabel lblRunnable = new JLabel("Runnable File: ");
 				lblRunnable.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblRunnable);
 			}
 			{
+				// Default setting for runnable file.
 				txtRunable = new JTextField();
 				txtRunable.setColumns(30);
 				panel.add(txtRunable);
 				txtRunable.setText("wordcount.jar");
 			}
 			{
+				// Allow browsing for a runnable file.
 				JButton btnRunnable = new JButton("Browse");
 				btnRunnable.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -100,11 +108,13 @@ public class AddJobDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// New label for the input file.
 				JLabel lblInput = new JLabel("Input File: ");
 				lblInput.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblInput);
 			}
 			{
+				// Set the default text. 
 				txtInput = new JTextField();
 				txtInput.setColumns(30);
 				panel.add(txtInput);
@@ -112,6 +122,7 @@ public class AddJobDialog extends JDialog {
 
 			}
 			{
+				// Allow browsing for a file.
 				JButton btnInput = new JButton("Browse");
 				panel.add(btnInput);
 				btnInput.addActionListener(new ActionListener() {
@@ -132,6 +143,7 @@ public class AddJobDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// New label for time limit. 
 				JLabel lblDeadline = new JLabel("Time Limit: ");
 				lblDeadline.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblDeadline);
@@ -142,6 +154,7 @@ public class AddJobDialog extends JDialog {
 				panel.add(txtDeadline);
 			}
 			{
+				// Label for milliseconds. 
 				JLabel lblMs = new JLabel("ms");
 				lblMs.setPreferredSize(new Dimension(30, 15));
 				panel.add(lblMs);
@@ -152,6 +165,7 @@ public class AddJobDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// New label for memory limit. 
 				JLabel lblMemory = new JLabel("Memory Limit: ");
 				lblMemory.setPreferredSize(new Dimension(85, 15));
 				panel.add(lblMemory);
@@ -162,6 +176,7 @@ public class AddJobDialog extends JDialog {
 				panel.add(txtMemory);
 			}
 			{
+				// Label for megabytes. 
 				JLabel lblMb = new JLabel("MB");
 				lblMb.setPreferredSize(new Dimension(30, 15));
 				panel.add(lblMb);
@@ -172,6 +187,7 @@ public class AddJobDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
+				// OK button for the dialog box. 
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
 				okButton.addActionListener(new ActionListener() {
@@ -185,6 +201,7 @@ public class AddJobDialog extends JDialog {
 						
 
 						if (jobName == null || jobName.trim().isEmpty()) {
+							// Error message if name not provided.
 							JOptionPane.showMessageDialog(AddJobDialog.this,
 									"The name of job is required.", "Error",
 									JOptionPane.ERROR_MESSAGE);
@@ -193,6 +210,7 @@ public class AddJobDialog extends JDialog {
 
 						if (!runnableFile.isFile()
 								|| !runnableFile.getName().endsWith(".jar")) {
+							// Error message if runnable file not provided. 
 							JOptionPane.showMessageDialog(AddJobDialog.this,
 									"A java runnable file is required.",
 									"Error", JOptionPane.ERROR_MESSAGE);
@@ -200,12 +218,14 @@ public class AddJobDialog extends JDialog {
 						}
 
 						if (!inputFile.isFile()) {
+							// Error message if input file not provided. 
 							JOptionPane.showMessageDialog(AddJobDialog.this,
 									"A input file is required.", "Error",
 									JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 
+						// Read time and memory limits. 
 						int timeLimit = -1, memoryLimit = -1;
 						try {
 							if (!txtDeadline.getText().trim().isEmpty()){
@@ -222,6 +242,8 @@ public class AddJobDialog extends JDialog {
 									JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						
+						// Create the new job. 
 						Job job = new Job(jobName, runnableFile, inputFile);
 						job.setTimeLimit(timeLimit);
 						job.setMemoryLimit(memoryLimit);
@@ -235,6 +257,7 @@ public class AddJobDialog extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
+				// Cancel button. 
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				cancelButton.addActionListener(new ActionListener() {

@@ -17,6 +17,10 @@ import javax.swing.border.EmptyBorder;
 
 import master.Master;
 
+/**
+ * Class for adding a worker, which allows details to be specified
+ * for a new worker. 
+ */
 public class AddWorkerDialog extends JDialog {
 
 	private static final long serialVersionUID = 3206590606836409332L;
@@ -46,11 +50,13 @@ public class AddWorkerDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// New label for address. 
 				lblAddress = new JLabel("Address:");
 				lblAddress.setPreferredSize(new Dimension(60, 15));
 				panel.add(lblAddress);
 			}
 			{
+				// Text field for address. 
 				txtAddress = new JTextField();
 				lblAddress.setLabelFor(txtAddress);
 				txtAddress.setColumns(10);
@@ -62,11 +68,13 @@ public class AddWorkerDialog extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 			{
+				// Label for port. 
 				lblPort = new JLabel("Port:");
 				lblPort.setPreferredSize(new Dimension(60, 15));
 				panel.add(lblPort);
 			}
 			{
+				// Text field for port. 
 				txtPort = new JTextField();
 				lblPort.setLabelFor(txtPort);
 				txtPort.setColumns(10);
@@ -88,16 +96,19 @@ public class AddWorkerDialog extends JDialog {
 						try {
 							port = Integer.parseInt(txtPort.getText());
 						} catch (NumberFormatException ex) {
+							// Error message if invalid port. 
 							JOptionPane.showMessageDialog(AddWorkerDialog.this,
 									"Port is required and must be a number.",
 									"Error", JOptionPane.ERROR_MESSAGE);
 						}
 						if (address.trim().isEmpty()){
+							// Error message if no address provided. 
 							JOptionPane.showMessageDialog(AddWorkerDialog.this,
 									"Address is required.", "Error",
 									JOptionPane.ERROR_MESSAGE);
 						}
 						else if (port < 0 && port > 65535){
+							// Error message if invalid port. 
 							JOptionPane.showMessageDialog(AddWorkerDialog.this,
 									"Port must between 0 and 65535.", "Error",
 									JOptionPane.ERROR_MESSAGE);
@@ -113,6 +124,7 @@ public class AddWorkerDialog extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
+				// Cancel button.
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
