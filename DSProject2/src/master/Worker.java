@@ -190,15 +190,15 @@ public class Worker {
 	 */
 	public int getWorkLoad() {
 		lock.lock();
-		workload = -1;
+
+
 		try {
 			Util.send(out, "RequestWorkLoad");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		while (workload == -1) {
-		}
+
 		return workload;
 	}
 
