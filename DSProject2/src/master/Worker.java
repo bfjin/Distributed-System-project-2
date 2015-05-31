@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package master;
 
 import gui.WorkerTable;
@@ -16,6 +22,10 @@ import common.Instruction;
 import common.JobInstruction;
 import common.Util;
 
+/**
+ * Worker class is a representation under the master that does the
+ * connection and communication with the actual worker on the cloud
+ * */
 public class Worker {
 
 	private Master master;

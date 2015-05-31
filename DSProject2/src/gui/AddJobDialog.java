@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package gui;
 
 import java.awt.BorderLayout;
@@ -21,8 +27,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import master.Job;
 import master.Master;
 
-public class AddJobDialog extends JDialog {
 
+public class AddJobDialog extends JDialog {
 	private static final long serialVersionUID = -1382469568373074545L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtRunable;

@@ -1,9 +1,18 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package common;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * AddJobInstruction class is a child class of JobInstruction
+ * */
 public class AddJobInstruction extends JobInstruction {
 
 	private int timeLimit;

@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package master;
 
 import gui.JobTable;
@@ -7,6 +13,9 @@ import java.util.UUID;
 
 import common.Util;
 
+/**
+ * Job class represents a job that can be done by the worker
+ * */
 public class Job {
 	
 	private String id;

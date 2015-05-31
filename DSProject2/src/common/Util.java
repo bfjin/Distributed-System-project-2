@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package common;
 
 import java.io.DataInputStream;
@@ -13,6 +19,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
+/**
+ * Util class contains all the utility functions that get used
+ * by other classes
+ * */
 public class Util {
 
 	public static int workerSocket = 4444;

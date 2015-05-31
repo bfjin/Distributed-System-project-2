@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package gui;
 
 import java.awt.Component;
@@ -12,6 +18,9 @@ import javax.swing.JFrame;
 
 import master.Master;
 
+/**
+ * Main starts a gui to begin
+ * */
 public class Main {
 
 	private JFrame frmMasterGui;

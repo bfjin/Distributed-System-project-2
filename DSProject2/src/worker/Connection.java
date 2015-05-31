@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package worker;
 
 import java.io.DataInputStream;
@@ -13,6 +19,10 @@ import common.Instruction;
 import common.JobInstruction;
 import common.Util;
 
+/**
+ * Connection class takes responsibility to make connection with the master
+ * and delegate work to the JobExecutor, and communicates with the master
+ * */
 class Connection extends Thread {
 	public static ReentrantLock lock;
 	private DataInputStream in;
@@ -35,6 +45,9 @@ class Connection extends Thread {
 	}
 
 	@Override
+	/**
+	 * read instruction from master and delegate to job executor
+	 */
 	public void run() {
 		while (true) {
 			Instruction inst = Util.receive(in);

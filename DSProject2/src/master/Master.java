@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package master;
 
 import gui.JobTable;
@@ -7,6 +13,9 @@ import java.util.ArrayList;
 
 import common.Util;
 
+/**
+ * Master class is for adding workers and jobs
+ * */
 public class Master {
 
 	private ArrayList<Worker> workers;
@@ -47,6 +56,10 @@ public class Master {
 		getWorkerTable().updateTable();
 	}
 
+	/**
+	 * select the worker with a minimum workload
+	 * @param workers array list of workers
+	 */
 	private Worker selectWorker(ArrayList<Worker> workers) {
 		int min = Integer.MAX_VALUE;
 		Worker selected = null;
@@ -62,6 +75,10 @@ public class Master {
 		return selected;
 	}
 
+	/**
+	 * return the job with the job id, null if cannot find
+	 * @param jobId job id
+	 */
 	public Job findJobById(String jobId) {
 		for (Job job : jobs) {
 			if (job.getId().equals(jobId)) {

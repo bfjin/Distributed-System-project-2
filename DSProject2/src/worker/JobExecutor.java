@@ -1,3 +1,9 @@
+/***
+ * Subject                      Distributed System
+ * Author: 						Bofan Jin, Fei Tang, Kimple Ke, Roger Li
+ * Date of last modification: 	31/05/2015
+ ***/
+
 package worker;
 
 import java.io.DataOutputStream;
@@ -10,6 +16,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import common.AddJobInstruction;
 import common.Util;
 
+/**
+ * JobExecutor class is where the job gets to be done
+ * */
 public class JobExecutor extends Thread {
 
 	private String jobId;	
@@ -33,33 +42,41 @@ public class JobExecutor extends Thread {
 	}
 
 	@Override
+	/**
+	 * Do the job
+	 */
 	public void run() {
 		String javaExePath = Paths
 				.get(System.getProperty("java.home"), "bin", "java")
 				.toAbsolutePath().toString();
 		int memoryLimit = instruction.getMemoryLimit();
 		ProcessBuilder builder = null;
+		// if memoryLimit has been set ...
 		if (memoryLimit != -1) {
+			// set it
 			String memoryLimitArg = "-xmx" + memoryLimit + "m";
 			builder = new ProcessBuilder(javaExePath, "-jar",
 					runnableFile.getPath(), inputFile.getPath(),
 					outputFile.getPath(), memoryLimitArg);
+		// else leave it 
 		} else {
 			builder = new ProcessBuilder(javaExePath, "-jar",
 					runnableFile.getPath(), inputFile.getPath(),
 					outputFile.getPath());
 		}
+		// if anything goes wrong, make a error file
 		builder.redirectError(errorFile);
 		try {
-
+			// do work
 			Process p = builder.start();
 			int timeLimit = instruction.getTimeLimit();
 			boolean finished = true;
+			// if timelimit has been set
 			if (timeLimit != -1) {
+				// wait for maximum timelimit of miliseconds
 				finished = p.waitFor(timeLimit, TimeUnit.MILLISECONDS);
+			// else leave it
 			} else {
-				// This take like 1 minute or longer
-				// BEAWARE
 				p.waitFor();
 			}
 			Connection.lock.lock();
