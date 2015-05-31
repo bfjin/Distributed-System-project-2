@@ -37,7 +37,6 @@ class Connection extends Thread {
 	@Override
 	public void run() {
 		while (true) {
-			System.err.println("Worker standby");
 			Instruction inst = Util.receive(in);
 			String message = inst.getMessage();
 			if (message.equals("AddJob")) {
@@ -48,7 +47,6 @@ class Connection extends Thread {
 			} else if (message.equals("Ready To Receive Result")) {
 				JobInstruction jobInstruction = (JobInstruction) inst;
 				String jobId = jobInstruction.getJobId();
-				System.err.println(jobId);
 				JobExecutor jobExecutor = findJobExcutorById(jobId);
 				jobExecutor.sendFile();
 			} else if (message.equals("File Received")) {
@@ -79,7 +77,6 @@ class Connection extends Thread {
 		File outputFile = Util.createFile("output.txt", folderPath);
 		File errorFile = Util.createFile("error.txt", folderPath);
 		
-		System.err.println("Connection locked");
 		lock.lock();
 		Util.send(out, "Ready To Receive Runnable File");
 		Util.receiveFile(in, runnableFile);
@@ -89,7 +86,6 @@ class Connection extends Thread {
 
 		Util.send(out, "File Received");
 		lock.unlock();
-		System.err.println("Connection unlocked");
 		JobExecutor jobExecutor = new JobExecutor(out, inst, runnableFile,
 				inputFile, outputFile, errorFile, lock);
 		jobExecutor.start();

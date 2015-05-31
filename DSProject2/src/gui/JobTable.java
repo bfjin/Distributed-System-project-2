@@ -63,13 +63,14 @@ public class JobTable extends JPanel {
 		@SuppressWarnings("unused")
 		ButtonColumn buttonColumn = new ButtonColumn(table, openOutputFile, 3);
 		
-		table.setPreferredScrollableViewportSize(new Dimension(500, 100));
+		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
         table.setFillsViewportHeight(true);
         
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane);
         
 		JFrame frame = new JFrame("JobsTable");
+		frame.setResizable(false);
 		
         // Create and set up the content pane.
         JobTable newContentPane = this;

@@ -62,7 +62,6 @@ public class JobExecutor extends Thread {
 				// BEAWARE
 				p.waitFor();
 			}
-			System.err.println("Job Executor locked");
 			Connection.lock.lock();
 			interrupt();
 			if (!finished || p.exitValue() != 0) {

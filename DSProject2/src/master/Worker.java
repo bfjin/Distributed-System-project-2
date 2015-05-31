@@ -89,6 +89,7 @@ public class Worker {
 		lock.lock();
 		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
+		job.setStatus(1);
 		currentJob = job;
 	}
 
@@ -115,7 +116,6 @@ public class Worker {
 
 	private void receiveData() {
 		while (true) {
-			System.err.println("Master standby");
 			Instruction inst = Util.receive(in);
 			String message = inst.getMessage();
 			if (message.equals("Done")) {
@@ -123,12 +123,10 @@ public class Worker {
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
 				File resultFile = job.getResultFile();
-				System.err.println("Worker locked");
 				lock.lock();
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
-				System.err.println("Worker locked");
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
@@ -137,14 +135,12 @@ public class Worker {
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
-				System.err.println("Worker locked");
 				lock.lock();
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
 				System.err.println("Unlocked");
 				lock.unlock();
-				System.err.println("Worker Unlocked");
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
 			} else if (message.equals("Ready To Receive Runnable File")) {
@@ -152,9 +148,7 @@ public class Worker {
 			} else if (message.equals("Ready To Receive Input File")) {
 				Util.sendFile(out, currentJob.getInputFile());
 			} else if (message.equals("File Received")) {
-				currentJob.setStatus(1);
 				lock = new ReentrantLock();
-				System.err.println("Worker forced unlocked");
 				currentJob = null;
 			} else if (message.startsWith("Current Workload: ")) {
 				workload = Integer.parseInt(message.substring(18));
@@ -162,7 +156,6 @@ public class Worker {
 			} else {
 				System.err.println("Unexpected message:  " + message);
 			}
-
 		}
 	}
 
