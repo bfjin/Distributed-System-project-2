@@ -8,8 +8,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.net.ssl.SSLSocket;
-
 import common.AddJobInstruction;
 import common.Instruction;
 import common.JobInstruction;
@@ -28,26 +26,6 @@ class Connection extends Thread {
 		jobExecutors = new ArrayList<JobExecutor>();
 		lock = new ReentrantLock();
 		try {
-/*
-			receiveSocket = socket;
-			receiveIn = new DataInputStream(receiveSocket.getInputStream());
-			receiveOut = new DataOutputStream(receiveSocket.getOutputStream());
-
-			String masterAddress = receiveSocket.getInetAddress()
-					.getHostAddress();
-
-			System.out.println("masterAddress = " + masterAddress);
-			
-			//SSLSocketFactory sslSocketFactory = 
-			//		(SSLSocketFactory) SSLSocketFactory.getDefault();
-			//sendSocket = sslSocketFactory.createSocket(masterAddress, Util.masterSocket);
-			sendSocket = new Socket(masterAddress, Util.masterSocket);
-
-			
-			sendIn = new DataInputStream(sendSocket.getInputStream());
-			sendOut = new DataOutputStream(sendSocket.getOutputStream());
-			*/
-
 			in = new DataInputStream(clientSocket.getInputStream());
 			out = new DataOutputStream(clientSocket.getOutputStream());
 		} catch (IOException e) {
@@ -61,44 +39,31 @@ class Connection extends Thread {
 		while (true) {
 			System.err.println("Worker standby");
 			Instruction inst = Util.receive(in);
-			lock.lock();
 			String message = inst.getMessage();
 			if (message.equals("AddJob")) {
-				System.out.println("Message:  " + message);
 				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
 				addJob(addJobInstruction);
 			} else if (message.equals("RequestWorkLoad")) {
-				System.out.println("Message:  " + message);
 				Util.send(out, worker.getWorkload() + "");
-				lock.unlock();
 			} else if (message.equals("Ready To Receive Result")) {
-				System.out.println("Message:  " + message);
 				JobInstruction jobInstruction = (JobInstruction) inst;
 				String jobId = jobInstruction.getJobId();
 				System.err.println(jobId);
 				JobExecutor jobExecutor = findJobExcutorById(jobId);
 				jobExecutor.sendFile();
 				System.err.println("ok");
-				lock.unlock();
-				
-			}
-			else if (message.equals("File Received")) {
-				//JobInstruction jobInstruction = (JobInstruction) inst;
-				//String jobId = jobInstruction.getJobId();
-				//JobExecutor jobExecutor = findJobExcutorById(jobId);
-				//jobExecutor.fileReceived();
-				System.out.println("Message:  " + message);
-			}
-			else {
+			} else if (message.equals("File Received")) {
+				lock = new ReentrantLock();
+			} else {
 				System.out.println("Unexpected message:  " + message);
 			}
 		}
 	}
 
 	private JobExecutor findJobExcutorById(String jobId) {
-		for (JobExecutor jobExecutor : jobExecutors )
+		for (JobExecutor jobExecutor : jobExecutors)
 			if (jobExecutor.getJobId().equals(jobId))
-				return jobExecutor;		
+				return jobExecutor;
 		return null;
 	}
 
@@ -113,7 +78,9 @@ class Connection extends Thread {
 		File inputFile = Util.createFile("input.txt", folderPath);
 		File outputFile = Util.createFile("output.txt", folderPath);
 		File errorFile = Util.createFile("error.txt", folderPath);
-
+		
+		System.err.println("Connection locked");
+		lock.lock();
 		Util.send(out, "Ready To Receive Runnable File");
 		Util.receiveFile(in, runnableFile);
 
@@ -122,9 +89,9 @@ class Connection extends Thread {
 
 		Util.send(out, "File Received");
 		lock.unlock();
-
+		System.err.println("Connection unlocked");
 		JobExecutor jobExecutor = new JobExecutor(out, inst, runnableFile,
-				inputFile, outputFile, errorFile);
+				inputFile, outputFile, errorFile, lock);
 		jobExecutor.start();
 		jobExecutors.add(jobExecutor);
 		worker.setWorkload(worker.getWorkload() + 1);

@@ -84,20 +84,11 @@ public class Worker {
 	}
 
 	public void sendJob(Job job) {		
-		System.err.println("Locked");
-		
-		
-		//lock.lock();
-		
-		
-		System.out.println("1");
+		System.err.println("Worker locked: " + lock.isLocked());
+		lock.lock();	
 		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
-		System.out.println("2");
 		currentJob = job;
-		System.err.println("Unlocked");
-		//lock.unlock();
-		System.out.println("Job sent 2");
 	}
 	
 	public int getWorkLoad() {		
@@ -124,50 +115,49 @@ public class Worker {
 	private void receiveData() {
 		while (true) {
 			System.err.println("Master standby");
-			Instruction inst = Util.receive(in);
-			System.err.println("Locked");
-			lock.lock();
+			Instruction inst = Util.receive(in);	
 			String message = inst.getMessage();
 			if (message.equals("Done")) {			
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(2);
 				File resultFile = job.getResultFile();
+				System.err.println("Worker locked");
+				lock.lock();
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
-				System.err.println("Unlocked");
+				System.err.println("Worker locked");
 				lock.unlock();
-				System.out.println("message = " + message);	
 			} else if (message.equals("Failed")) {				
 				Job job = master
 						.findJobById(((JobInstruction) inst).getJobId());
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
+				System.err.println("Worker locked");
+				lock.lock();
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
 				System.err.println("Unlocked");
 				lock.unlock();
-				System.out.println("message = " + message);	
+				System.err.println("Worker Unlocked");
 			}
 			else if (message.equals("Ready To Receive Runnable File")){
 				Util.sendFile(out, currentJob.getRunnableFile());
-				System.out.println("message = " + message);	
 			}
 			else if (message.equals("Ready To Receive Input File")){
 				Util.sendFile(out, currentJob.getRunnableFile());
-				System.out.println("message = " + message);	
 			}
 			else if (message.equals("File Received")){
 				currentJob.setStatus(1);
-				System.err.println("Unlocked");
-				lock.unlock();
+				System.err.println(lock.isLocked());				
+				lock =  new ReentrantLock();
+				System.err.println(lock.isLocked());
 				currentJob = null;
-				System.out.println("message = " + message);	
 			}
 			else {
-				System.out.println("Unexpected message:  " + message);
+				System.err.println("Unexpected message:  " + message);
 			}
 
 		}

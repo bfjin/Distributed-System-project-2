@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import javax.net.ssl.SSLSocket;
-
 import common.Util;
 
 public class Listener {
@@ -25,7 +23,7 @@ public class Listener {
 //			serverSocket.setNeedClientAuth(true);  
 			System.out.println("Worker Started");
 			while (true) {			
-				//SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
+//				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("A new connection is detected");
 				Connection c = new Connection(clientSocket, this);

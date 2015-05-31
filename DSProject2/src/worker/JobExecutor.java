@@ -20,9 +20,10 @@ public class JobExecutor extends Thread {
 	private File outputFile;
 	private File errorFile;
 	private boolean error;
+	private ReentrantLock lock;
 
 	public JobExecutor(DataOutputStream out, AddJobInstruction inst, File runnableFile,
-			File inputFile, File outputFile, File errorFile) {
+			File inputFile, File outputFile, File errorFile, ReentrantLock lock) {
 		this.out = out;
 		this.instruction = inst;
 		this.runnableFile = runnableFile;
@@ -30,6 +31,7 @@ public class JobExecutor extends Thread {
 		this.outputFile = outputFile;
 		this.errorFile = errorFile;
 		this.jobId = instruction.getJobId();
+		this.lock = lock;
 	}
 
 	@Override
@@ -62,30 +64,16 @@ public class JobExecutor extends Thread {
 				// BEAWARE
 				p.waitFor();
 			}
-			//lock.lock();
+			System.err.println("Job Executor locked");
+			lock.lock();
 			interrupt();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(out, "Failed", instruction.getJobId());
 				error = true;
-//				String reply = Util.receive(in).getMessage();
-//				if (reply.equals("Ready To Receive Result")) {
-//					
-//				}
 			} else {
 				Util.send(out, "Done", instruction.getJobId());
 				error = false;
-//				String reply = Util.receive(in).getMessage();
-//				if (reply.equals("Ready To Receive Result")) {
-//					Util.sendFile(out, outputFile);
-//				}
 			}
-//			String reply = Util.receive(in).getMessage();
-//			System.out.println("xxx");
-//			if (reply.equals("File Received")) {
-//				lock.unlock();
-//			//	worker.setWorkload(worker.getWorkload() - 1);
-//				System.out.println("zzz");
-//			}
 			System.out.println("message = " + "aaa");		
 		} catch (InterruptedException e) {
 			System.err.println("Job interrupted");
@@ -103,11 +91,6 @@ public class JobExecutor extends Thread {
 		else {
 			Util.sendFile(out, outputFile);
 		}
-	}
-	
-	public void fileReceived() {
-	//	lock.unlock();
-	//	worker.setWorkload(worker.getWorkload() - 1);
 	}
 
 	/**
