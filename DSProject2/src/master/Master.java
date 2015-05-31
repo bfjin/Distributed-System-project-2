@@ -27,20 +27,24 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket,
-		//		getWorkerTable()));
+		 workers.add(new Worker(this, "127.0.0.1", Util.workerSocket,
+				getWorkerTable()));
 		 //workers.add(new Worker(this, "146.118.97.86", Util.workerSocket,
 		 //workerTable));
-		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
-		 workerTable));
-		 
-
-		 workers.add(new Worker(this, "43.240.96.206", Util.workerSocket,
-		 workerTable));
-		 workers.add(new Worker(this, "43.240.96.207", Util.workerSocket,
-		 workerTable));
+//		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
+//		 workerTable));
+//		 
+//	
+//		 workers.add(new Worker(this, "43.240.96.206", Util.workerSocket,
+//		 workerTable));
+//		 workers.add(new Worker(this, "43.240.96.207", Util.workerSocket,
+//		 workerTable));
 	}
 
+	/**
+	 * adds a job
+	 * @param job job to be done
+	 */
 	public void addJob(Job job) {
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
@@ -50,6 +54,11 @@ public class Master {
 			getJobTable().updateTable();
 	}
 
+	/**
+	 * adds the worker to the list
+	 * @param address ip address of the worker 
+	 * @param port port number of the worker
+	 */
 	public void addWorker(String address, int port) {
 		Worker worker = new Worker(this, address, port, getWorkerTable());
 		workers.add(worker);
