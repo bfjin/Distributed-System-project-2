@@ -34,7 +34,7 @@ public class Worker {
 	private WorkerTable workerTable;
 
 	private Job currentJob;
-	
+
 	private int workload;
 
 	public int getWorkerID() {
@@ -82,6 +82,7 @@ public class Worker {
 				workerTable.updateTable();
 			}
 		} catch (IOException e) {
+			running = false;
 			System.err.println("Failed to establish connection");
 			e.printStackTrace();
 		}
@@ -89,7 +90,9 @@ public class Worker {
 
 	/**
 	 * Send a job to a worker
-	 * @param job job to be send
+	 * 
+	 * @param job
+	 *            job to be send
 	 */
 	public void sendJob(Job job) {
 		lock.lock();
@@ -98,7 +101,6 @@ public class Worker {
 		job.setStatus(1);
 		currentJob = job;
 	}
-
 
 	private void receiveData() {
 		while (true) {
@@ -143,34 +145,33 @@ public class Worker {
 			}
 		}
 	}
-	
+
 	/**
 	 * @return the workload of the worker
 	 */
 	public int getWorkLoad() {
 		lock.lock();
+		workload = -1;
 		Util.send(out, "RequestWorkLoad");
-		while (lock.isLocked()) {
-
-			//Wait until lock is unlocked
+		while (workload == -1) {
 		}
 		return workload;
 	}
-	
+
 	/**
 	 * @return the status of the worker
 	 */
 	public boolean isRunning() {
 		return running;
 	}
-	
+
 	/**
 	 * @return the worker address
 	 */
 	public String getAddress() {
 		return address;
 	}
-	
+
 	/**
 	 * @return the port
 	 */
