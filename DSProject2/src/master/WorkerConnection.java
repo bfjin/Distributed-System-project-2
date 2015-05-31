@@ -26,7 +26,7 @@ import common.Util;
  * Worker class is a representation under the master that does the
  * connection and communication with the actual worker on the cloud
  * */
-public class Worker {
+public class WorkerConnection {
 
 	private Master master;
 	private String address;
@@ -51,7 +51,7 @@ public class Worker {
 		return workerID;
 	}
 
-	public Worker(Master master, String address, int port,
+	public WorkerConnection(Master master, String address, int port,
 			WorkerTable workerTable) {
 		this.master = master;
 		this.address = address;
@@ -76,9 +76,6 @@ public class Worker {
 			SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory
 					.getDefault();
 			Socket socket = sslSocketFactory.createSocket(address, port);
-			// @SuppressWarnings("resource")
-			// Socket socket = new Socket(address, port);
-
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
 			running = true;
@@ -106,12 +103,20 @@ public class Worker {
 	 */
 	public void sendJob(Job job) {
 		lock.lock();
-		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
-				job.getMemoryLimit());
+		try {
+			Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
+					job.getMemoryLimit());
+		} catch (IOException e) {
+			System.err.println("Add job sending failed.");
+			e.printStackTrace();
+		}
 		job.setStatus(1);
 		currentJob = job;
 	}
 
+	/**
+	 * Communicate with the cloud workers
+	 */
 	private void receiveData() {
 		while (true) {
 			Instruction inst = Util.receive(in);
@@ -122,9 +127,15 @@ public class Worker {
 				job.setStatus(2);
 				File resultFile = job.getResultFile();
 				lock.lock();
-				Util.send(out, "Ready To Receive Result", job.getId());
-				Util.receiveFile(in, resultFile);
-				Util.send(out, "File Received", job.getId());
+				
+				try {
+					Util.send(out, "Ready To Receive Result", job.getId());
+					Util.receiveFile(in, resultFile);
+					Util.send(out, "File Received", job.getId());
+				} catch (IOException e) {
+					System.err.println("File Receive Failed.");
+					e.printStackTrace();
+				}		
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
@@ -134,16 +145,31 @@ public class Worker {
 				job.setStatus(3);
 				File resultFile = job.getResultFile();
 				lock.lock();
-				Util.send(out, "Ready To Receive Result", job.getId());
-				Util.receiveFile(in, resultFile);
-				Util.send(out, "File Received", job.getId());
+				try {
+					Util.send(out, "Ready To Receive Result", job.getId());
+					Util.receiveFile(in, resultFile);
+					Util.send(out, "File Received", job.getId());
+				} catch (IOException e) {
+					System.err.println("File Receive Failed.");
+					e.printStackTrace();
+				}
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
 			} else if (message.equals("Ready To Receive Runnable File")) {
-				Util.sendFile(out, currentJob.getRunnableFile());
+				try {
+					Util.sendFile(out, currentJob.getRunnableFile());
+				} catch (IOException e) {
+					System.err.println("Failed when sending file");
+					e.printStackTrace();
+				}
 			} else if (message.equals("Ready To Receive Input File")) {
-				Util.sendFile(out, currentJob.getInputFile());
+				try {
+					Util.sendFile(out, currentJob.getInputFile());
+				} catch (IOException e) {
+					System.err.println("Failed when sending file");
+					e.printStackTrace();
+				}
 			} else if (message.equals("File Received")) {
 				lock = new ReentrantLock();
 				currentJob = null;
@@ -161,8 +187,11 @@ public class Worker {
 	 */
 	public int getWorkLoad() {
 		lock.lock();
-		Util.send(out, "RequestWorkLoad");
-		while (lock.isLocked()) {
+		try {
+			Util.send(out, "RequestWorkLoad");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Integer.MAX_VALUE;			
 		}
 		return workload;
 	}

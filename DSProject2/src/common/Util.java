@@ -27,103 +27,83 @@ public class Util {
 
 	public static int workerSocket = 4444;
 
-	public static void sendFile(DataOutputStream out, File file) {
+	public static void sendFile(DataOutputStream out, File file) throws IOException {
 		System.out.println("Sending File: " + file.getPath());
-		try {
-			byte [] bytearray  = new byte [8192];
-			FileInputStream fin = new FileInputStream(file);
-			int len = 0;
-			int totalBytesSent = 0;
-			out.writeLong(file.length());
-			while ((len = fin.read(bytearray)) > -1) {
-				out.write(bytearray, 0, len);
-				totalBytesSent += len;				
-			}
-			System.out.println("totalBytesSent = " + totalBytesSent);		
-			fin.close();
-		} catch (IOException e) {
-			System.err.println("Failed when sending file");
-			e.printStackTrace();
+
+		byte [] bytearray  = new byte [8192];
+		FileInputStream fin = new FileInputStream(file);
+		int len = 0;
+		int totalBytesSent = 0;
+		out.writeLong(file.length());
+		while ((len = fin.read(bytearray)) > -1) {
+			out.write(bytearray, 0, len);
+			totalBytesSent += len;				
 		}
+		System.out.println("totalBytesSent = " + totalBytesSent);		
+		fin.close();
+
 	}
 
-	public static File receiveFile(DataInputStream in, File file) {
+	public static File receiveFile(DataInputStream in, File file) throws IOException {
 		System.out.println("Receiving File: " + file.getPath());
 
-		try {
-			byte[] bytearray = new byte[8192];
-			FileOutputStream fos = new FileOutputStream(file);
-			int bytesRead = 0;
-			int totalBytesRead = 0;
-			long totalFileLength = in.readLong();
-			do {
-				bytesRead = in.read(bytearray, 0, bytearray.length);
-				if(bytesRead >= 0) {
-					totalBytesRead += bytesRead;
-					fos.write(bytearray, 0, bytesRead);
-				}
-			} while (totalBytesRead < totalFileLength);
-			System.out.println("totalBytesRead =  " + totalBytesRead);
-			fos.close();
-		} catch (IOException e) {
-			System.err.println("Failed when receiving file");
-			e.printStackTrace();
-		}
+
+		byte[] bytearray = new byte[8192];
+		FileOutputStream fos = new FileOutputStream(file);
+		int bytesRead = 0;
+		int totalBytesRead = 0;
+		long totalFileLength = in.readLong();
+		do {
+			bytesRead = in.read(bytearray, 0, bytearray.length);
+			if(bytesRead >= 0) {
+				totalBytesRead += bytesRead;
+				fos.write(bytearray, 0, bytesRead);
+			}
+		} while (totalBytesRead < totalFileLength);
+		System.out.println("totalBytesRead =  " + totalBytesRead);
+		fos.close();
+
+
+
 		return file;
 	}
 
-	public static void send(DataOutputStream out, String message) {
-		try {
-			String data = new Instruction(message).toJson();
-			out.writeUTF(data);
-			System.out.println("Send: " + data);
-		} catch (IOException e) {
-			System.err.println("Failed when sending message");
-			e.printStackTrace();
-		}
+	public static void send(DataOutputStream out, String message) throws IOException {
+		String data = new Instruction(message).toJson();
+		out.writeUTF(data);
+		System.out.println("Send: " + data);
 	}
 
-	public static void send(DataOutputStream out, String message, String jobId) {
-		try {
-			String data = new JobInstruction(message, jobId).toJson();
-			out.writeUTF(data);
-			System.out.println("Send: " + data);
-		} catch (IOException e) {
-			System.err.println("Failed when sending message");
-			e.printStackTrace();
-		}
+	public static void send(DataOutputStream out, String message, String jobId) throws IOException {
+		String data = new JobInstruction(message, jobId).toJson();
+		out.writeUTF(data);
+		System.out.println("Send: " + data);
 	}
 
 	public static void send(DataOutputStream out, String message, String jobId,
-			int timeLimit, int memoryLimit) {
-		try {
-			String data = new AddJobInstruction(message, jobId, timeLimit,
-					memoryLimit).toJson();
-			out.writeUTF(data);
-			System.out.println("Send: " + data);
-		} catch (IOException e) {
-			System.err.println("Failed when sending message");
-			e.printStackTrace();
-		}
+		int timeLimit, int memoryLimit) throws IOException {
+
+		String data = new AddJobInstruction(message, jobId, timeLimit,
+				memoryLimit).toJson();
+		out.writeUTF(data);
+		System.out.println("Send: " + data);
 	}
 
 	public static Instruction receive(DataInputStream in) {
 		try {	
 			String data = in.readUTF();
-			// TODO deal with receive file
-			//if (data.length() < 1000) {
-				System.out.println("Receive: " + data);
-				String type = Instruction.getTypefromJson(data);
-				if (type.equals("Instruction")){
-					return Instruction.fromJson(data);
-				}
-				if (type.equals("JobInstruction")){
-					return JobInstruction.fromJson(data);
-				}
-				if (type.equals("AddJobInstruction")){
-					return AddJobInstruction.fromJson(data);
-				}
-			//}
+
+			System.out.println("Receive: " + data);
+			String type = Instruction.getTypefromJson(data);
+			if (type.equals("Instruction")){
+				return Instruction.fromJson(data);
+			}
+			if (type.equals("JobInstruction")){
+				return JobInstruction.fromJson(data);
+			}
+			if (type.equals("AddJobInstruction")){
+				return AddJobInstruction.fromJson(data);
+			}
 			return new Instruction("");
 		} catch (IOException e) {
 			System.err.println("Failed when receive instruction, Connection Lost");

@@ -17,24 +17,23 @@ import common.Util;
  * Listener class represents a worker on the cloud server listens the
  * instruction sent from the master
  * */
-public class Listener {
+public class Worker {
 	
 	private int workload; 
 
 	public static void main(String args[]) {
-		new Listener(Util.workerSocket);
+		new Worker(Util.workerSocket);
 	}
 
-	public Listener(int serverPort) {
+	public Worker(int serverPort) {
 		setWorkload(0);
 		try {			
 			ServerSocket serverSocket = Util.getServerSocket(serverPort);
 			System.out.println("Worker Started");
 			while (true) {			
 				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
-//				Socket clientSocket = serverSocket.accept();
 				System.out.println("A new connection is detected");
-				Connection c = new Connection(clientSocket, this);
+				MasterConnection c = new MasterConnection(clientSocket, this);
 				c.start();
 			}
 		} catch (IOException e) {

@@ -18,58 +18,74 @@ import common.Util;
  * */
 public class Master {
 
-	private ArrayList<Worker> workers;
+	private ArrayList<WorkerConnection> workerConnections;
 	private ArrayList<Job> jobs;
 	private JobTable jobTable;
 	private WorkerTable workerTable;
 
 	public Master() {
-		workers = new ArrayList<Worker>();
+		workerConnections = new ArrayList<WorkerConnection>();
 		jobs = new ArrayList<Job>();
 
-		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket,
-		//		getWorkerTable()));
-		 //workers.add(new Worker(this, "146.118.97.86", Util.workerSocket,
-		 //workerTable));
-//		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
-//		 workerTable));
-		 
-
-		 workers.add(new Worker(this, "43.240.96.206", Util.workerSocket,
-		 workerTable));
-		 workers.add(new Worker(this, "43.240.96.207", Util.workerSocket,
-		 workerTable));
+//		workerConnections.add(new WorkerConnection(this, "127.0.0.1",
+//				Util.workerSocket, getWorkerTable()));
+//		workerConnections.add(new WorkerConnection(this, "146.118.97.86",
+//				Util.workerSocket, workerTable));
+//		workerConnections.add(new WorkerConnection(this, "146.118.97.88",
+//				Util.workerSocket, workerTable));
+		workerConnections.add(new WorkerConnection(this, "43.240.96.206",
+				Util.workerSocket, workerTable));
+		workerConnections.add(new WorkerConnection(this, "43.240.96.207",
+				Util.workerSocket, workerTable));
 	}
 
+	/**
+	 * adds a job
+	 * 
+	 * @param job
+	 *            job to be done
+	 */
 	public void addJob(Job job) {
 		jobs.add(job);
-		Worker worker = selectWorker(workers);
+		WorkerConnection workerConnection = selectWorker(workerConnections);
 		System.out.println("Job send");
-		worker.sendJob(job);
+		workerConnection.sendJob(job);
 		if (getJobTable() != null)
 			getJobTable().updateTable();
 	}
 
+	/**
+	 * adds the worker to the list
+	 * 
+	 * @param address
+	 *            ip address of the worker
+	 * @param port
+	 *            port number of the worker
+	 */
 	public void addWorker(String address, int port) {
-		Worker worker = new Worker(this, address, port, getWorkerTable());
-		workers.add(worker);
+		WorkerConnection workerConnection = new WorkerConnection(this, address,
+				port, getWorkerTable());
+		workerConnections.add(workerConnection);
 		getWorkerTable().updateTable();
 	}
 
 	/**
 	 * select the worker with a minimum workload
-	 * @param workers array list of workers
+	 * 
+	 * @param workerConnections
+	 *            array list of workers
 	 */
-	private Worker selectWorker(ArrayList<Worker> workers) {
+	private WorkerConnection selectWorker(
+			ArrayList<WorkerConnection> workerConnections) {
 		int min = Integer.MAX_VALUE;
-		Worker selected = null;
-		for (Worker worker : workers) {
-			int workload = worker.getWorkLoad();
+		WorkerConnection selected = null;
+		for (WorkerConnection workerConnection : workerConnections) {
+			int workload = workerConnection.getWorkLoad();
 			if (workload < min) {
 				min = workload;
-				selected = worker;
+				selected = workerConnection;
 			}
-			System.err.println("workerid = " + worker.getWorkerID());
+			System.err.println("workerid = " + workerConnection.getWorkerID());
 			System.err.println("workload = " + workload);
 		}
 		return selected;
@@ -77,7 +93,9 @@ public class Master {
 
 	/**
 	 * return the job with the job id, null if cannot find
-	 * @param jobId job id
+	 * 
+	 * @param jobId
+	 *            job id
 	 */
 	public Job findJobById(String jobId) {
 		for (Job job : jobs) {
@@ -98,8 +116,8 @@ public class Master {
 	/**
 	 * @return the workers
 	 */
-	public ArrayList<Worker> getWorkers() {
-		return workers;
+	public ArrayList<WorkerConnection> getWorkers() {
+		return workerConnections;
 	}
 
 	/**
@@ -111,7 +129,9 @@ public class Master {
 
 	/**
 	 * Set the jobTable
-	 * @param jobTable the jobTable to set
+	 * 
+	 * @param jobTable
+	 *            the jobTable to set
 	 */
 	public void setJobTable(JobTable jobTable) {
 		this.jobTable = jobTable;
@@ -126,7 +146,9 @@ public class Master {
 
 	/**
 	 * Set the workerTalbe
-	 * @param workerTable the workerTable to set
+	 * 
+	 * @param workerTable
+	 *            the workerTable to set
 	 */
 	public void setWorkerTable(WorkerTable workerTable) {
 		this.workerTable = workerTable;

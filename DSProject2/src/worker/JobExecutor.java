@@ -79,7 +79,7 @@ public class JobExecutor extends Thread {
 			} else {
 				p.waitFor();
 			}
-			Connection.lock.lock();
+			MasterConnection.lock.lock();
 			interrupt();
 			if (!finished || p.exitValue() != 0) {
 				Util.send(out, "Failed", instruction.getJobId());
@@ -102,10 +102,20 @@ public class JobExecutor extends Thread {
 	 */
 	public void sendOutputFile(){
 		if (error){
-			Util.sendFile(out, errorFile);
+			try {
+				Util.sendFile(out, errorFile);
+			} catch (IOException e) {
+				System.err.println("Failed when sending file");
+				e.printStackTrace();
+			}
 		}
 		else {
-			Util.sendFile(out, outputFile);
+			try {
+				Util.sendFile(out, outputFile);
+			} catch (IOException e) {
+				System.err.println("Failed when sending file");
+				e.printStackTrace();
+			}
 		}
 	}
 

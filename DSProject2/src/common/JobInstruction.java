@@ -46,7 +46,6 @@ public class JobInstruction extends Instruction {
 			return new JobInstruction((String) obj.get("Message"),
 					(String) obj.get("JobId"));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}

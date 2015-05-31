@@ -51,7 +51,6 @@ public class Instruction {
 			JSONObject obj = (JSONObject) parser.parse(json);
 			return new Instruction((String) obj.get("Message"));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -63,7 +62,6 @@ public class Instruction {
 			JSONObject obj = (JSONObject) parser.parse(json);
 			return (String) obj.get("Type");
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}

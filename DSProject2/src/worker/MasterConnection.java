@@ -23,14 +23,14 @@ import common.Util;
  * Connection class takes responsibility to make connection with the master
  * and delegate work to the JobExecutor, and communicates with the master
  * */
-class Connection extends Thread {
+class MasterConnection extends Thread {
 	public static ReentrantLock lock;
 	private DataInputStream in;
 	private DataOutputStream out;	
-	private Listener worker;
+	private Worker worker;
 	private ArrayList<JobExecutor> jobExecutors;
 
-	public Connection(Socket clientSocket, Listener worker) {
+	public MasterConnection(Socket clientSocket, Worker worker) {
 		setDaemon(true);
 		this.worker = worker;
 		jobExecutors = new ArrayList<JobExecutor>();
@@ -57,7 +57,12 @@ class Connection extends Thread {
 				worker.setWorkload(worker.getWorkload() + 1);
 				addJob(addJobInstruction);
 			} else if (message.equals("RequestWorkLoad")) {
-				Util.send(out, "Current Workload: " + worker.getWorkload());
+				try {
+					Util.send(out, "Current Workload: " + worker.getWorkload());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else if (message.equals("Ready To Receive Result")) {
 				JobInstruction jobInstruction = (JobInstruction) inst;
 				String jobId = jobInstruction.getJobId();
@@ -101,13 +106,17 @@ class Connection extends Thread {
 		File errorFile = Util.createFile("error.txt", folderPath);
 		
 		lock.lock();
-		Util.send(out, "Ready To Receive Runnable File");
-		Util.receiveFile(in, runnableFile);
-
-		Util.send(out, "Ready To Receive Input File");
-		Util.receiveFile(in, inputFile);
-
-		Util.send(out, "File Received");
+		try {
+			Util.send(out, "Ready To Receive Runnable File");
+			Util.receiveFile(in, runnableFile);
+			Util.send(out, "Ready To Receive Input File");
+			Util.receiveFile(in, inputFile);	
+			Util.send(out, "File Received");
+		}
+		catch (IOException e) {
+			System.err.println("File Receive Failed");
+			e.printStackTrace();
+		}
 		lock.unlock();
 		JobExecutor jobExecutor = new JobExecutor(out, inst, runnableFile,
 				inputFile, outputFile, errorFile, lock);
