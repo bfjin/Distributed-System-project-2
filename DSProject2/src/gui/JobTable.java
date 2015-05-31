@@ -31,6 +31,10 @@ public class JobTable extends JPanel {
 	Object[][] tableData = new Object[50][4];
 	JTable table;
 	
+	/**
+	 * Constructor for JobTable. 
+	 * @param master Contains data about jobs. 
+	 */
 	public JobTable(Master master) {
 		jobs = master.getJobs();
 		
@@ -59,18 +63,17 @@ public class JobTable extends JPanel {
 			}
 		};
 		
-		// Creates buttons on the fourth column for opening output file
+		// Creates buttons on the fourth column for opening output file.
 		@SuppressWarnings("unused")
 		ButtonColumn buttonColumn = new ButtonColumn(table, openOutputFile, 3);
 		
-		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
         
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane);
         
 		JFrame frame = new JFrame("JobsTable");
-		frame.setResizable(false);
 		
         // Create and set up the content pane.
         JobTable newContentPane = this;
@@ -82,9 +85,7 @@ public class JobTable extends JPanel {
         frame.setVisible(true);
 	}
 	
-	/**
-	 * Model for the job table.
-	 */
+	// Model for the job table.
 	class JobTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = 172087816491090660L;
@@ -141,7 +142,7 @@ public class JobTable extends JPanel {
 				tableStatus = "Failed";
 			}
 			tableData[count] = new String[]{j.getJobName(), j.getId(), 
-					tableStatus, j.getResultFile().toString()};
+					tableStatus, "Open"};
 			count++;
 		}
 		table.repaint();

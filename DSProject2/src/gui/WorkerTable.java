@@ -25,19 +25,22 @@ public class WorkerTable extends JPanel {
 	Object[][] tableData = new Object[50][3];
 	JTable table;
 	
+	/**
+	 * Constructor for WorkerTable.
+	 * @param master Contains data about workers. 
+	 */
 	public WorkerTable(Master master) {
 		workers = master.getWorkers();
 		
 		tableData[0] = new Object[]{"No workers", "N/A", "N/A"};
 		table = new JTable(new WorkerTableModel());
-		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
         
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane);
         
 		JFrame frame = new JFrame("WorkersTable");
-		frame.setResizable(false);
 		
         // Create and set up the content pane.
         WorkerTable newContentPane = this;
@@ -49,9 +52,7 @@ public class WorkerTable extends JPanel {
         frame.setVisible(true);
 	}
 
-	/**
-	 * Model for the worker table. 
-	 */
+	// Model for worker table.
 	class WorkerTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = -6383618404857911463L;
