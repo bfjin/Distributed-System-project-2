@@ -22,8 +22,8 @@ public class Master {
 		//		getWorkerTable()));
 		 //workers.add(new Worker(this, "146.118.97.86", Util.workerSocket,
 		 //workerTable));
-		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
-		 workerTable));
+//		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
+//		 workerTable));
 		 
 
 		 workers.add(new Worker(this, "43.240.96.206", Util.workerSocket,
@@ -56,7 +56,6 @@ public class Master {
 				min = workload;
 				selected = worker;
 			}
-			System.err.println("workerid = " + worker.getWorkerID());
 			System.err.println("workload = " + workload);
 		}
 		return selected;
