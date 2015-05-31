@@ -37,31 +37,54 @@ public class Job {
 		memoryLimit = -1;
 	}
 	
+	/**
+	 * Set the jobTable
+	 * @param jobTable 
+	 */
 	public void setJobTable(JobTable jobTable) {
 		this.jobTable = jobTable;
 	}
 	
+	/**
+	 * @return the job name
+	 */
 	public String getJobName() {
 		return name;
 	}
 
+	/**
+	 * @return the status
+	 */
 	public int getStatus() {
 		return status;
 	}
 
+	/**
+	 * @return the runnableFile
+	 */
 	public File getRunnableFile() {
 		return runnableFile;
 	}
 
-
+	/**
+	 * @return the intputFile
+	 */
 	public File getInputFile() {
 		return inputFile;
 	}
 	
+	/**
+	 * @return the resultFile
+	 */
 	public File getResultFile() {
 		return resultFile;
 	}
-
+	
+	
+	/**
+	 * Set the status
+	 * @param status 
+	 */
 	public void setStatus(int status) {
 		this.status = status;
 		if (this.jobTable != null) {
@@ -77,6 +100,7 @@ public class Job {
 	}
 
 	/**
+	 * Set the id
 	 * @param id the id to set
 	 */
 	public void setId(String id) {
@@ -91,6 +115,7 @@ public class Job {
 	}
 
 	/**
+	 * Set the timeLimist
 	 * @param timeLimit the timeLimit to set
 	 */
 	public void setTimeLimit(int timeLimit) {
@@ -105,6 +130,7 @@ public class Job {
 	}
 
 	/**
+	 * Set the memoryLimit
 	 * @param memoryLimit the memoryLimit to set
 	 */
 	public void setMemoryLimit(int memoryLimit) {

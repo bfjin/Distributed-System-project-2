@@ -35,10 +35,17 @@ public class Listener {
 		}
 	}
 
+	/**
+	 * @return the workload
+	 */
 	public int getWorkload() {
 		return workload;
 	}
 
+	/**
+	 * Set the workload
+	 * @param workload
+	 */
 	public void setWorkload(int workload) {
 		this.workload = workload;
 	}

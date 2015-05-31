@@ -179,12 +179,9 @@ public class AddJobDialog extends JDialog {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						String jobName = txtName.getText();
-						if (runnableFile == null){
-							runnableFile = new File(txtRunable.getText());
-						}
-						if (inputFile == null){
-							inputFile = new File(txtInput.getText());
-						}
+						runnableFile = new File(txtRunable.getText());
+						inputFile = new File(txtInput.getText());
+						
 
 						if (jobName == null || jobName.trim().isEmpty()) {
 							JOptionPane.showMessageDialog(AddJobDialog.this,

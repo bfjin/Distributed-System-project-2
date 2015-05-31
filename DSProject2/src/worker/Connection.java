@@ -41,6 +41,7 @@ class Connection extends Thread {
 			String message = inst.getMessage();
 			if (message.equals("AddJob")) {
 				AddJobInstruction addJobInstruction = (AddJobInstruction) inst;
+				worker.setWorkload(worker.getWorkload() + 1);
 				addJob(addJobInstruction);
 			} else if (message.equals("RequestWorkLoad")) {
 				Util.send(out, "Current Workload: " + worker.getWorkload());
@@ -48,7 +49,7 @@ class Connection extends Thread {
 				JobInstruction jobInstruction = (JobInstruction) inst;
 				String jobId = jobInstruction.getJobId();
 				JobExecutor jobExecutor = findJobExcutorById(jobId);
-				jobExecutor.sendFile();
+				jobExecutor.sendOutputFile();
 			} else if (message.equals("File Received")) {
 				lock = new ReentrantLock();
 				worker.setWorkload(worker.getWorkload() - 1);
@@ -58,6 +59,10 @@ class Connection extends Thread {
 		}
 	}
 
+	/**
+	 * Find a running jobExcutor given a job id
+	 * @param jobId job id
+	 */
 	private JobExecutor findJobExcutorById(String jobId) {
 		for (JobExecutor jobExecutor : jobExecutors)
 			if (jobExecutor.getJobId().equals(jobId))
@@ -65,6 +70,11 @@ class Connection extends Thread {
 		return null;
 	}
 
+	/**
+	 * Receive all the required file to run the job and make a jobExecutor to
+	 * do the job.
+	 * @param inst job instruction
+	 */
 	private void addJob(AddJobInstruction inst) {
 		String jobId = inst.getJobId();
 		System.out.println("Job Id: " + jobId);
@@ -90,7 +100,7 @@ class Connection extends Thread {
 				inputFile, outputFile, errorFile, lock);
 		jobExecutor.start();
 		jobExecutors.add(jobExecutor);
-		worker.setWorkload(worker.getWorkload() + 1);
+		
 	}
 
 }

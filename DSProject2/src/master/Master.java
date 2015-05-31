@@ -18,10 +18,14 @@ public class Master {
 		workers = new ArrayList<Worker>();
 		jobs = new ArrayList<Job>();
 
-//		workers.add(new Worker(this, "127.0.0.1", Util.workerSocket,
-//				getWorkerTable()));
-		// workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
-		// workerTable));
+		//workers.add(new Worker(this, "127.0.0.1", Util.workerSocket,
+		//		getWorkerTable()));
+		 //workers.add(new Worker(this, "146.118.97.86", Util.workerSocket,
+		 //workerTable));
+		 workers.add(new Worker(this, "146.118.97.88", Util.workerSocket,
+		 workerTable));
+		 
+
 		 workers.add(new Worker(this, "43.240.96.206", Util.workerSocket,
 		 workerTable));
 		 workers.add(new Worker(this, "43.240.96.207", Util.workerSocket,
@@ -31,7 +35,6 @@ public class Master {
 	public void addJob(Job job) {
 		jobs.add(job);
 		Worker worker = selectWorker(workers);
-		System.err.println("workerid = " + worker.getWorkerID());
 		System.out.println("Job send");
 		worker.sendJob(job);
 		if (getJobTable() != null)
@@ -53,6 +56,8 @@ public class Master {
 				min = workload;
 				selected = worker;
 			}
+			System.err.println("workerid = " + worker.getWorkerID());
+			System.err.println("workload = " + workload);
 		}
 		return selected;
 	}
@@ -66,10 +71,16 @@ public class Master {
 		return null;
 	}
 
+	/**
+	 * @return the jobs
+	 */
 	public ArrayList<Job> getJobs() {
 		return jobs;
 	}
 
+	/**
+	 * @return the workers
+	 */
 	public ArrayList<Worker> getWorkers() {
 		return workers;
 	}
@@ -82,6 +93,7 @@ public class Master {
 	}
 
 	/**
+	 * Set the jobTable
 	 * @param jobTable the jobTable to set
 	 */
 	public void setJobTable(JobTable jobTable) {
@@ -96,6 +108,7 @@ public class Master {
 	}
 
 	/**
+	 * Set the workerTalbe
 	 * @param workerTable the workerTable to set
 	 */
 	public void setWorkerTable(WorkerTable workerTable) {

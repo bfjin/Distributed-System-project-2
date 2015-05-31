@@ -80,7 +80,10 @@ public class JobExecutor extends Thread {
 		}
 	}
 	
-	public void sendFile(){
+	/**
+	 * Send output file back to the master.
+	 */
+	public void sendOutputFile(){
 		if (error){
 			Util.sendFile(out, errorFile);
 		}

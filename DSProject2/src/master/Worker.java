@@ -57,6 +57,9 @@ public class Worker {
 		receiveThread.start();
 	}
 
+	/**
+	 * Connect to a given address and port number using SSL connection
+	 */
 	public void connect() {
 		try {
 
@@ -84,8 +87,11 @@ public class Worker {
 		}
 	}
 
+	/**
+	 * Send a job to a worker
+	 * @param job job to be send
+	 */
 	public void sendJob(Job job) {
-		System.err.println("Worker locked");
 		lock.lock();
 		Util.send(out, "AddJob", job.getId(), job.getTimeLimit(),
 				job.getMemoryLimit());
@@ -93,26 +99,6 @@ public class Worker {
 		currentJob = job;
 	}
 
-	public int getWorkLoad() {
-		lock.lock();
-		Util.send(out, "RequestWorkLoad");
-		while (lock.isLocked()) {
-			//Wait until lock is unlocked
-		}
-		return workload;
-	}
-
-	public boolean isRunning() {
-		return running;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public int getPort() {
-		return port;
-	}
 
 	private void receiveData() {
 		while (true) {
@@ -139,7 +125,6 @@ public class Worker {
 				Util.send(out, "Ready To Receive Result", job.getId());
 				Util.receiveFile(in, resultFile);
 				Util.send(out, "File Received", job.getId());
-				System.err.println("Unlocked");
 				lock.unlock();
 				if (master.getJobTable() != null)
 					master.getJobTable().updateTable();
@@ -158,5 +143,38 @@ public class Worker {
 			}
 		}
 	}
+	
+	/**
+	 * @return the workload of the worker
+	 */
+	public int getWorkLoad() {
+		lock.lock();
+		Util.send(out, "RequestWorkLoad");
+		while (lock.isLocked()) {
 
+			//Wait until lock is unlocked
+		}
+		return workload;
+	}
+	
+	/**
+	 * @return the status of the worker
+	 */
+	public boolean isRunning() {
+		return running;
+	}
+	
+	/**
+	 * @return the worker address
+	 */
+	public String getAddress() {
+		return address;
+	}
+	
+	/**
+	 * @return the port
+	 */
+	public int getPort() {
+		return port;
+	}
 }
