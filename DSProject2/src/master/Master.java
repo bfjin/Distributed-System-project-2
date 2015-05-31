@@ -11,8 +11,6 @@ import gui.WorkerTable;
 
 import java.util.ArrayList;
 
-import common.Util;
-
 /**
  * Master class is for adding workers and jobs
  * */
@@ -26,17 +24,6 @@ public class Master {
 	public Master() {
 		workerConnections = new ArrayList<WorkerConnection>();
 		jobs = new ArrayList<Job>();
-
-//		workerConnections.add(new WorkerConnection(this, "127.0.0.1",
-//				Util.workerSocket, getWorkerTable()));
-//		workerConnections.add(new WorkerConnection(this, "146.118.97.86",
-//				Util.workerSocket, workerTable));
-//		workerConnections.add(new WorkerConnection(this, "146.118.97.88",
-//				Util.workerSocket, workerTable));
-		workerConnections.add(new WorkerConnection(this, "43.240.96.206",
-				Util.workerSocket, workerTable));
-		workerConnections.add(new WorkerConnection(this, "43.240.96.207",
-				Util.workerSocket, workerTable));
 	}
 
 	/**
@@ -45,13 +32,16 @@ public class Master {
 	 * @param job
 	 *            job to be done
 	 */
-	public void addJob(Job job) {
+	public boolean addJob(Job job) {
 		jobs.add(job);
 		WorkerConnection workerConnection = selectWorker(workerConnections);
+		if (workerConnection == null)
+			return false;
 		System.out.println("Job send");
 		workerConnection.sendJob(job);
 		if (getJobTable() != null)
 			getJobTable().updateTable();
+		return true;
 	}
 
 	/**

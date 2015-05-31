@@ -253,7 +253,10 @@ public class AddJobDialog extends JDialog {
 						Job job = new Job(jobName, runnableFile, inputFile);
 						job.setTimeLimit(timeLimit);
 						job.setMemoryLimit(memoryLimit);
-						master.addJob(job);
+						if (!master.addJob(job))
+							JOptionPane.showMessageDialog(AddJobDialog.this,
+									"No available worker.", "Error",
+									JOptionPane.ERROR_MESSAGE);
 						setVisible(false);
 						dispose();
 					}
